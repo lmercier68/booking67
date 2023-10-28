@@ -258,7 +258,7 @@ add_action('rest_api_init', function () {
 // Route pour ajouter une nouvelle option.
     register_rest_route('booker67/v1', '/options', array(
         'methods' => 'POST',
-        'callback' => 'add_option'
+        'callback' => 'add_options'
     ));
 
 // Route pour mettre à jour une option en utilisant son ID.
@@ -452,7 +452,7 @@ function get_all_options() {
  * @param WP_REST_Request $request
  * @return WP_REST_Response
  */
-function add_option(WP_REST_Request $request) {
+function add_options(WP_REST_Request $request) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_options';
 
@@ -534,3 +534,4 @@ function count_options_by_generic_type(WP_REST_Request $request) {
     // Retourner le compte sous forme de tableau associatif
     return array('count' => intval($count));
 }
+
