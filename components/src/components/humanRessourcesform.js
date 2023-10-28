@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+import HumanList from './humanList';
 function HumanRessourcesForm() {
 	const [nom, setNom] = useState('');
 	const [prenom, setPrenom] = useState('');
@@ -41,6 +42,10 @@ function HumanRessourcesForm() {
 
 	return (
 		<div>
+			<div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px' }}>
+				<HumanList/>
+			</div>
+			<div>
 			<input
 				type="text"
 				placeholder="Nom"
@@ -68,6 +73,7 @@ function HumanRessourcesForm() {
 				/>
 			</div>
 			<button onClick={handleSubmit}>Ajouter</button>
+			</div>
 		</div>
 	);
 }
