@@ -3,7 +3,7 @@
 /* global wpApiSettings */
 import { useState,useContext } from 'react';
 import PlannerLine from './planner_line';
-import HumanRessourcesActifSelect from './humanactiflist';
+import HumanRessourcesActifSelect from './humanActiflist';
 //import { Spinner } from 'react-bootstrap/Spinner';
 import { SelectionProvider, SelectionContext } from './scripts/SelectionContext';
 
