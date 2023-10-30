@@ -34,7 +34,23 @@ function PrestationForm() {
                 // Gérer l'erreur ici si nécessaire.
             });
     };
-
+    const handleDelete = (prestationId) => {
+        fetch(`/wp-json/booker67/v1/prestations/${prestationId}`, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log('delete ok');
+                    loadAssignedPrestations(practicianId);
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Erreur lors de la suppression');
+            });
+    };
     useEffect(() => {
         fetch('/wp-json/booker67/v1/options/generic_type/genType_prestation')
             .then(response => response.json())
@@ -113,9 +129,17 @@ function PrestationForm() {
                         style={{ border: '1px solid black', minHeight: '50px', marginBottom: '10px' }}
                     >
                         {assignedPrestations.map(prestation => (
-                            <div key={prestation.id}>
-                                {prestation.prestation_name} - {prestation.prestation_cost}  euro - {prestation.prestation_duration} min.
-                            </div>
+
+                            <div key={prestation.id} style={{ display: 'flex', alignItems: 'center' }}>
+                        {prestation.prestation_name} - {prestation.prestation_cost} euro - {prestation.prestation_duration} min.
+                        <button
+                            type="button"
+                            onClick={() => handleDelete(prestation.id)}
+                            style={{ backgroundColor: 'red', color: 'white', marginLeft: '10px',borderRadius : '50%'}}
+                        >
+                            X
+                        </button>
+                    </div>
                         ))}
                     </div>
                     <label>
