@@ -382,7 +382,11 @@ add_action('rest_api_init', function () {
         'methods' => 'GET',
         'callback' => 'get_prestations_by_practitioner_id',
     ));
+    register_rest_route('booker67/v1', '/prestations/(?P<id>\d+)', array(
+        'methods' => 'DELETE',
+        'callback' => 'delete_prestation',
 
+    ));
 //endregion
 });
 
@@ -698,4 +702,19 @@ function get_prestations_by_practitioner_id(WP_REST_Request $request) {
     // Retourner une réponse REST API avec les résultats
     return new WP_REST_Response($results, 200);
 }
+function delete_prestation($data) {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $prestation_id = $data['id'];
+
+    $result = $wpdb->delete($table_name, array('id' => $prestation_id));
+
+    if ($result === false) {
+        return new WP_Error('prestation_delete_failed', 'La suppression de la prestation a échoué', array('status' => 500));
+    }
+
+    return new WP_REST_Response('Prestation supprimée avec succès', 200);
+}
+
 //endregion
