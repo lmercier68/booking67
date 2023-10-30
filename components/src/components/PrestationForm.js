@@ -46,16 +46,17 @@ function PrestationForm() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        //const [hours, minutes] = prestationDuration.split(':');
-        //const durationInMinutes = parseInt(hours) * 60 + parseInt(minutes);
+        if (!practicianId || practicianId === '0') {
+            alert('Veuillez sélectionner un praticien avant de sauvegarder.');
+            return;
+        }
 
         const data = {
             practitioner_id: practicianId,
             prestation_name: selectedPrestation,
             prestation_cost: prestationCost,
-            prestation_duration: prestationDuration, // Convertissez la durée en minutes
+            prestation_duration: prestationDuration,
         };
-
 
         fetch('/wp-json/booker67/v1/prestations', {
             method: 'POST',
@@ -67,13 +68,32 @@ function PrestationForm() {
             .then((response) => response.json())
             .then((result) => {
                 console.log(result);
-                // Vous pouvez ajouter ici du code pour gérer le résultat de la requête
+                // Recharger les prestations assignées après la réussite de l'enregistrement
+                loadAssignedPrestations(practicianId);
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
     };
 
+// Fonction pour charger les prestations assignées à un praticien
+    const loadAssignedPrestations = (practicianId) => {
+        fetch(`/wp-json/booker67/v1/prestations/practitioner_id/${practicianId}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return [];  // Si la réponse est 404 ou autre, retournez un tableau vide.
+                }
+            })
+            .then(result => {
+                setAssignedPrestations(result);
+            })
+            .catch(error => {
+                console.error(error);
+                // Gérer l'erreur ici si nécessaire.
+            });
+    };
     const unassignedPrestations = prestationsList.filter(p =>
         !assignedPrestations.some(ap => ap.prestation_name === p.value)
     );
