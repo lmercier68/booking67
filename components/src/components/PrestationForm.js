@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import HumanRessourcesActifSelect from './HumanActiflist';
 import GenericOptionsAdder from "./GenericOptionsAdder";
 import { SelectionContext } from './scripts/SelectionContext';
-
+import EditPrestationModal from './EditPrestationModal';
 function PrestationForm() {
     const [practicianId, setPracticianId] = useState(0);
     const [prestationsList, setPrestationsList] = useState([]);
@@ -13,6 +13,8 @@ function PrestationForm() {
     const [prestationDuration, setPrestationDuration] = useState('');
     const [selectedPrestation, setSelectedPrestation] = useState('');
 
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [prestationToEdit, setPrestationToEdit] = useState(null);
     const handleHumanRessourceChange = (event) => {
         const practitionerId = event.target.value;
         console.log(practitionerId);
@@ -114,63 +116,111 @@ function PrestationForm() {
         !assignedPrestations.some(ap => ap.prestation_name === p.value)
     );
 
-    console.log(assignedPrestations);
+    const handleEdit = (prestation) => {
+        setIsEditModalOpen(true);
+        setPrestationToEdit(prestation);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setPrestationToEdit(null);
+    };
+
+    const handleSaveEdit = (editedPrestation) => {
+        // Mise à jour de la prestation en base de données
+        fetch(`/wp-json/booker67/v1/prestations/${editedPrestation.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(editedPrestation),
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log(result);
+                // Mise à jour de la liste des prestations
+                loadAssignedPrestations(practicianId);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    };
     return (
-        <div>
+        <div style={{ fontFamily: "'Arial', sans-serif", padding: '20px' }}>
             <GenericOptionsAdder genericTypeProp={'prestation'} maxAllowed={3} />
             <hr />
-            <p><h2>Affectation de prestation</h2></p>
+            <h2 style={{ color: '#333', marginBottom: '20px' }}>Affectation de prestation</h2>
             <div style={{ display: 'flex' }}>
-                <form onSubmit={handleSubmit} style={{ flex: 1 }}>
+                <form onSubmit={handleSubmit} style={{ flex: 1, marginRight: '20px' }}>
                     <SelectionContext.Provider value={{ handleHumanRessourceChange }}>
                         <HumanRessourcesActifSelect handleHumanRessourceChange={handleHumanRessourceChange} />
                     </SelectionContext.Provider>
                     <div
-                        style={{ border: '1px solid black', minHeight: '50px', marginBottom: '10px' }}
+                        style={{ border: '1px solid #e0e0e0', padding: '10px', borderRadius: '5px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}
                     >
                         {assignedPrestations.map(prestation => (
-
-                            <div key={prestation.id} style={{ display: 'flex', alignItems: 'center' }}>
-                        {prestation.prestation_name} - {prestation.prestation_cost} euro - {prestation.prestation_duration} min.
-                        <button
-                            type="button"
-                            onClick={() => handleDelete(prestation.id)}
-                            style={{ backgroundColor: 'red', color: 'white', marginLeft: '10px',borderRadius : '50%'}}
-                        >
-                            X
-                        </button>
-                    </div>
+                            <div key={prestation.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                <span style={{ flex: 1 }}>{prestation.prestation_name}</span>
+                                <span style={{ flex: 1 }}>{prestation.prestation_cost} euro</span>
+                                <span style={{ flex: 1 }}>{prestation.prestation_duration} min.</span>
+                                <button
+                                    type="button"
+                                    onClick={() => handleDelete(prestation.id)}
+                                    style={{ backgroundColor: 'red', color: 'white', padding: '5px 10px', borderRadius: '5px', marginRight: '5px' }}
+                                >
+                                    Supprimer
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleEdit(prestation)}
+                                    style={{ backgroundColor: 'blue', color: 'white', padding: '5px 10px', borderRadius: '5px' }}
+                                >
+                                    Modifier
+                                </button>
+                            </div>
                         ))}
                     </div>
-                    <label>
-                        Prestation:
-                        <select value={selectedPrestation} onChange={(e) => setSelectedPrestation(e.target.value)}>
-                            <option value="">Choisissez une prestation</option>
-                            {unassignedPrestations.map((prestation) => (
-                                <option key={prestation.id} value={prestation.value}>
-                                    {prestation.value}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <label>
-                        Coût:
-                        <input
-                            type="text"
-                            value={prestationCost}
-                            onChange={(e) => setPrestationCost(e.target.value)}
-                        />
-                    </label>
-                    <label>
-                        Durée:
-                        <input
-                            type="time"
-                            value={prestationDuration}
-                            onChange={(e) => setPrestationDuration(e.target.value+ ':00')}
-                            step="60" // Limitez les secondes à 00
-                        />
-                    </label>
-                    <button type="submit">Sauvegarder</button>
+                    <EditPrestationModal
+                        isOpen={isEditModalOpen}
+                        onClose={handleCloseEditModal}
+                        prestation={prestationToEdit}
+                        onSave={handleSaveEdit}
+                    />
+                    <div style={{ marginTop: '20px' }}>
+                        <label style={{ marginRight: '20px' }}>
+                            Prestation:
+                            <select value={selectedPrestation} onChange={(e) => setSelectedPrestation(e.target.value)} style={{ marginLeft: '10px' }}>
+                                <option value="">Choisissez une prestation</option>
+                                {unassignedPrestations.map((prestation) => (
+                                    <option key={prestation.id} value={prestation.value}>
+                                        {prestation.value}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label style={{ marginRight: '20px' }}>
+                            Coût:
+                            <input
+                                type="text"
+                                value={prestationCost}
+                                onChange={(e) => setPrestationCost(e.target.value)}
+                                style={{ marginLeft: '10px' }}
+                            />
+                        </label>
+                        <label>
+                            Durée:
+                            <input
+                                type="time"
+                                value={prestationDuration}
+                                onChange={(e) => setPrestationDuration(e.target.value + ':00')}
+                                step="60"
+                                style={{ marginLeft: '10px' }}
+                            />
+                        </label>
+                        <button type="submit" style={{ display: 'block', marginTop: '20px', padding: '10px 15px', backgroundColor: '#4CAF50', color: 'white', borderRadius: '5px' }}>
+                            Sauvegarder
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -178,201 +228,3 @@ function PrestationForm() {
 }
 
 export default PrestationForm;
-
-/*
-function PrestationForm() {
-    const [practicianId, setPracticianId] = useState(0);
-    const [prestationsList, setPrestationsList] = useState([]);
-    const [assignedPrestations, setAssignedPrestations] = useState([]);
-    const [prestationCost, setPrestationCost] = useState('');
-    const [prestationDuration, setPrestationDuration] = useState('');
-    const [prestationName, setPrestationName] = useState('');
-
-    const handleHumanRessourceChange = (event) => {
-        const practitionerId = event.target.value;
-        console.log(practitionerId);
-        setPracticianId(practitionerId);
-
-        fetch(`/wp-json/booker67/v1/prestations/practitioner_id/${practitionerId}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    return [];  // Si la réponse est 404 ou autre, retournez un tableau vide.
-                }
-            })
-            .then(result => {
-                setAssignedPrestations(result);
-            })
-            .catch(error => {
-                console.error(error);
-                // Gérer l'erreur ici si nécessaire.
-            });
-    };
-    useEffect(() => {
-        fetch('/wp-json/booker67/v1/options/generic_type/genType_prestation')
-            .then(response => response.json())
-            .then(result => {
-                setPrestationsList(result);
-            });
-    }, []);
-
-    const handleDrop = (event) => {
-        event.preventDefault();
-        const prestationId = event.dataTransfer.getData('text');
-        const prestation = prestationsList.find(p => p.id.toString() === prestationId);
-        if (prestation) {
-            setPrestationName(prestation.value);
-        }
-    };
-
-    const handleDragOver = (event) => {
-        event.preventDefault();
-    };
-    const handlePrestationCostChange = (event) => {
-        setPrestationCost(event.target.value);
-    };
-
-    const handlePrestationDurationChange = (event) => {
-        setPrestationDuration(event.target.value);
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        const data = {
-            practician_id: practicianId,
-            prestation_name: prestationName,
-            prestation_cost: prestationCost,
-            prestation_duration: prestationDuration,
-        };
-
-        fetch('/wp-json/booker67/v1/prestations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-            .then((response) => response.json())
-            .then((result) => {
-                console.log(result);
-                // Vous pouvez ajouter ici du code pour gérer le résultat de la requête
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    };
-    const unassignedPrestations = prestationsList.filter(p =>
-        !assignedPrestations.some(ap => ap.prestation_name === p.value)
-    );
-
-    console.log(assignedPrestations);
-    return (<div>
-        <GenericOptionsAdder genericTypeProp={'prestation'} maxAllowed={3}/>
-        <hr/>
-        <p><h2>Affectation de prestation</h2></p>
-        <div style={{ display: 'flex' }}>
-            <form onSubmit={handleSubmit} style={{ flex: 1 }}>
-                <SelectionContext.Provider value={{ handleHumanRessourceChange }}>
-                <HumanRessourcesActifSelect  handleHumanRessourceChange={handleHumanRessourceChange}/>
-            </SelectionContext.Provider>
-                <div
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    style={{ border: '1px solid black', minHeight: '50px', marginBottom: '10px' }}
-                >
-                    {assignedPrestations.map(prestation => (
-                        <div key={prestation.id}>
-                            {prestation.prestation_name} - {prestation.prestation_cost}  euro - {prestation.prestation_duration} min.
-                        </div>
-                    ))}
-                </div>
-                <label>
-                    Coût:
-                    <input
-                        type="text"
-                        value={prestationCost}
-                        onChange={(e) => setPrestationCost(e.target.value)}
-                    />
-                </label>
-                <label>
-                    Durée:
-                    <input
-                        type="text"
-                        value={prestationDuration}
-                        onChange={(e) => setPrestationDuration(e.target.value)}
-                    />
-                </label>
-                <button type="submit">Sauvegarder</button>
-            </form>
-            <div style={{ flex: 1, marginLeft: '10px' }}>
-                <h3>Liste des prestations</h3>
-                <ul>
-                    {unassignedPrestations.map((prestation) => (
-                        <li
-                            key={prestation.id}
-                            draggable="true"
-                            onDragStart={(event) => event.dataTransfer.setData('text', prestation.id.toString())}
-                        >
-                            {prestation.value}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-    </div>
-    );
-}
-
-export default PrestationForm;
-        /*
-    };
-
-    return (<div>
-            <GenericOptionsAdder genericTypeProp={'prestation'} maxAllowed={3}/>
-            <hr/>
-            <p><h2>Affectation de prestation</h2></p>
-        <form onSubmit={handleSubmit}>
-            <HumanRessourcesActifSelect
-                handleHumanRessourceChange={handleHumanRessourceChange}
-            />
-            <div>
-                <label>
-                    Nom de la prestation:
-                    <input
-                        type="text"
-                        value={prestationName}
-                        onChange={handlePrestationNameChange}
-                    />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Coût de la prestation:
-                    <input
-                        type="number"
-                        value={prestationCost}
-                        onChange={handlePrestationCostChange}
-                    />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Durée de la prestation:
-                    <input
-                        type="time"
-                        value={prestationDuration}
-                        onChange={handlePrestationDurationChange}
-                    />
-                </label>
-            </div>
-            <div>
-                <button type="submit">Enregistrer</button>
-            </div>
-        </form>
-        </div>
-    );
-}
-
-export default PrestationForm;*/
