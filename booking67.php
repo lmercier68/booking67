@@ -387,6 +387,30 @@ add_action('rest_api_init', function () {
         'callback' => 'delete_prestation',
 
     ));
+    register_rest_route( 'booker67/v1', '/prestations/(?P<id>\d+)', array(
+        'methods' => 'PUT',
+        'callback' => 'update_prestation',
+        'args' => array(
+            'id' => array(
+                'required' => true,
+                'validate_callback' => function( $param, $request, $key ) {
+                    return is_numeric( $param );
+                }
+            ),
+            'prestation_cost' => array(
+                'required' => true,
+                'validate_callback' => function( $param, $request, $key ) {
+                    return is_numeric( $param );
+                }
+            ),
+            'prestation_duration' => array(
+                'required' => true,
+                'validate_callback' => function( $param, $request, $key ) {
+                    return preg_match( '/^\d{2}:\d{2}:\d{2}$/', $param );
+                }
+            ),
+        ),
+    ) );
 //endregion
 });
 
@@ -715,6 +739,31 @@ function delete_prestation($data) {
     }
 
     return new WP_REST_Response('Prestation supprimée avec succès', 200);
+}
+function update_prestation( $data ) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_prestations';
+
+    $prestation_id = $data['id'];
+    $prestation_cost = $data['prestation_cost'];
+    $prestation_duration = $data['prestation_duration'];
+
+    $result = $wpdb->update(
+        $table_name,
+        array(
+            'prestation_cost' => $prestation_cost,
+            'prestation_duration' => $prestation_duration,
+        ),
+        array( 'id' => $prestation_id )
+    );
+
+    if ( false === $result ) {
+        return new WP_Error( 'prestation_update_failed', 'Failed to update prestation', array( 'status' => 500 ) );
+    }
+
+    $prestation = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE id = %d", $prestation_id ), ARRAY_A );
+
+    return new WP_REST_Response( $prestation, 200 );
 }
 
 //endregion
