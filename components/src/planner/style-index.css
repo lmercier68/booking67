@@ -1,0 +1,19 @@
+.time-slot {
+  padding: 5px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.available {
+  background-color: lightgreen;
+}
+
+.unavailable {
+  background-color: lightcoral;
+}
+
+.time-slot.selected-for-deletion {
+  background-color: orange;
+}
+
+/*# sourceMappingURL=style-index.css.map */

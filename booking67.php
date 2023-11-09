@@ -13,6 +13,8 @@
  * @package           bookering
  */
 
+
+
 // Ajout d'une action pour le menu d'administration
 add_action('admin_menu', 'my_custom_admin_menu');
 
@@ -132,6 +134,13 @@ function booker67_enqueue_public_scripts()
     wp_enqueue_script('jquery-ui-datepicker');
     wp_enqueue_script('jquery-ui-dialog');
     wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css');
+    wp_enqueue_script(
+        'mon-plugin-frontend',
+        plugins_url('build/frontend.js', __FILE__),
+        array('wp-element'),
+        filemtime(plugin_dir_path(__FILE__) . 'build/frontend.js'),
+        true
+    );
 }
 add_action('wp_enqueue_scripts', 'booker67_enqueue_public_scripts');
 //region database_table_creation
@@ -378,6 +387,13 @@ add_action('rest_api_init', function () {
         'callback' => 'save_prestation',
 
     ));
+
+    register_rest_route('booker67/v1', '/prestations', array(
+        'methods' => 'GET',
+        'callback' => 'get_prestations',
+
+    ));
+
     register_rest_route('booker67/v1', '/prestations/practitioner_id/(?P<practitioner_id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_prestations_by_practitioner_id',
@@ -707,6 +723,31 @@ function save_prestation($data) {
     // Retour du résultat
     return new WP_REST_Response('Prestation sauvegardée avec succès', 200);
 }
+
+
+
+
+
+function get_prestations(WP_REST_Request $request) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_prestations';
+
+    // Nettoyer le paramètre "practitioner_id" pour éviter des problèmes de sécurité
+
+
+    // Récupérer toutes les lignes de la table qui correspondent au practitioner_id donné
+    $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name"));
+
+    // Vérifier si des résultats ont été trouvés
+    if (empty($results)) {
+        // Retourner une réponse REST API avec un tableau vide et un statut de 200
+        return new WP_REST_Response([], 200);
+    }
+
+    // Retourner une réponse REST API avec les résultats
+    return new WP_REST_Response($results, 200);
+}
+
 function get_prestations_by_practitioner_id(WP_REST_Request $request) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_prestations';
@@ -767,3 +808,27 @@ function update_prestation( $data ) {
 }
 
 //endregion
+function booking67_block_init() {
+    //register_block_type( __DIR__ . '/build/dateplanner' );
+    //register_block_type( __DIR__ . '/build/timeselect' );
+     register_block_type( __DIR__ . '/build/planner' );
+
+}
+add_action( 'init', 'booking67_block_init' );
+
+
+function mon_plugin_enqueue_scripts() {
+    // Enregistre nos scripts React (ne les met pas encore en file d'attente)
+    wp_register_script('mon-plugin-frontend-js', plugins_url('/build/frontend.js', __FILE__), ['wp-element'], time(), true);
+    wp_register_style('mon-plugin-frontend-css', plugins_url('/build/frontend.css', __FILE__));  // Optionnel
+}
+add_action('wp_enqueue_scripts', 'mon_plugin_enqueue_scripts');
+
+function booking67_frontend_shortcode() {
+    // Enqueue React scripts and styles
+    wp_enqueue_script('mon-plugin-frontend-js');  // Handle que vous avez défini lors de l'enregistrement du script
+    wp_enqueue_style('mon-plugin-frontend-css');  // Optionnel: Si vous avez des styles spécifiques pour le frontend
+
+    return '<div id="booking67-root"></div>';  // Cette div sera notre point d'ancrage pour React
+}
+add_shortcode('booking67_frontend', 'booking67_frontend_shortcode');
