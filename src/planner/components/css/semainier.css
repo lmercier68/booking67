@@ -1,0 +1,15 @@
+.semainier {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.semainier th,
+.semainier td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.semainier th {
+    background-color: #f2f2f2;
+}

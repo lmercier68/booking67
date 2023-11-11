@@ -14,7 +14,6 @@
  */
 
 
-
 // Ajout d'une action pour le menu d'administration
 add_action('admin_menu', 'my_custom_admin_menu');
 
@@ -62,11 +61,13 @@ function my_custom_admin_menu()
     );
 
 }
+
 function booking67_prestations_page()
 {
     echo '<h1>Gestion des prestations</h1>';
     echo '<div id="root-prestations" data-page="prestations"></div>';
 }
+
 // Fonction affichant le contenu de la page principale du plugin
 function booking67_admin_page()
 {
@@ -106,9 +107,9 @@ function load_cra_app($hook_suffix)
         }
 
         // Chemin vers les fichiers de l'application CRA
-        $files = glob(__DIR__.'/components/build/static/js/main.*.js');
+        $files = glob(__DIR__ . '/components/build/static/js/main.*.js');
         $mainFile = !empty($files) ? basename($files[0]) : 'main.js';
-        $script_path = plugins_url('components/build/static/js/'.$mainFile, __FILE__);
+        $script_path = plugins_url('components/build/static/js/' . $mainFile, __FILE__);
         $style_path = plugins_url('components/build/static/css/main.073c9b0a.css', __FILE__);
 
         // Enregistrement et mise en file d'attente des scripts et styles
@@ -142,6 +143,7 @@ function booker67_enqueue_public_scripts()
         true
     );
 }
+
 add_action('wp_enqueue_scripts', 'booker67_enqueue_public_scripts');
 //region database_table_creation
 // Création de la table "booker67_human_ressource" lors de l'activation du plugin
@@ -163,6 +165,7 @@ function create_booking67_human_ressources_table()
         dbDelta($sql);
     }
 }
+
 register_activation_hook(__FILE__, 'create_booking67_human_ressources_table');
 
 function create_practician_availability_table()
@@ -186,9 +189,11 @@ function create_practician_availability_table()
         dbDelta($sql);
     }
 }
+
 register_activation_hook(__FILE__, 'create_practician_availability_table');
 
-function create_booker67_options_table() {
+function create_booker67_options_table()
+{
     global $wpdb;
 
     $charset_collate = $wpdb->get_charset_collate();
@@ -204,8 +209,10 @@ function create_booker67_options_table() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
+
 register_activation_hook(__FILE__, 'create_booker67_options_table');
-function create_prestations_table() {
+function create_prestations_table()
+{
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'booker67_prestations';
@@ -221,11 +228,77 @@ function create_prestations_table() {
         PRIMARY KEY  (id)
     ) $charset_collate;";
 
-    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-    dbDelta( $sql );
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
 }
 
 register_activation_hook(__FILE__, 'create_prestations_table');
+
+function create_rdv_table()
+{
+    global $wpdb;
+
+    // Nom de la table
+    $table_name = $wpdb->prefix . 'booker67_rdv';
+
+
+    $charset_collate = $wpdb->get_charset_collate();
+
+    // Création de la table si elle n'existe pas déjà
+    $sql = "CREATE TABLE $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        practician_id integer NOT NULL,
+        prestation_id integer NOT NULL,
+        prestation_duration time NOT NULL,
+        rdv_dateTime datetime NOT NULL,
+        rdv_status integer NOT NULL,
+        customer_id integer ,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+
+    insert_random_data_for_testing();
+
+}
+
+register_activation_hook(__FILE__, 'create_rdv_table');
+
+
+function insert_random_data_for_testing()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_rdv';
+
+    // Génération de données aléatoires
+    for ($i = 0; $i < 10; $i++) {
+        $practician_id = rand(1, 4); // ID de practician entre 1 et 4
+        $prestation_id = rand(1, 3); // ID de prestation entre 1 et 3
+        $durations = ['15:00', '30:00', '45:00']; // Durées de prestation
+        $prestation_duration = $durations[array_rand($durations)];
+        $rdv_status = rand(1, 4); // Status du RDV entre 1 et 4
+
+        // Générer une date aléatoire entre le 11/11/2023 et le 25/11/2023
+        $start_date = strtotime('11-11-2023');
+        $end_date = strtotime('25-11-2023');
+        $random_date = mt_rand($start_date, $end_date);
+        $rdv_dateTime = date('Y-m-d H:i:s', $random_date);
+
+        // Insertion des données dans la base de données
+        $wpdb->insert(
+            $table_name,
+            array(
+                'practician_id' => $practician_id,
+                'prestation_id' => $prestation_id,
+                'prestation_duration' => $prestation_duration,
+                'rdv_dateTime' => $rdv_dateTime,
+                'rdv_status' => $rdv_status
+            )
+        );
+    }
+}
+
 // Fonction pour ajouter une ressource humaine via l'API REST
 function add_human_ressource(WP_REST_Request $request)
 {
@@ -252,6 +325,7 @@ function add_human_ressource(WP_REST_Request $request)
 
     return new WP_REST_Response(array('success' => true, 'message' => 'Ressource ajoutée avec succès.'), 200);
 }
+
 //endregion
 // Ajout de la route pour l'API REST
 add_action('rest_api_init', function () {
@@ -302,13 +376,16 @@ add_action('rest_api_init', function () {
         }
     ));
 
-// Route pour obtenir les disponibilités d'un praticien.
+// Route pour obtenir les disponibilités des praticien.
     register_rest_route('booker67/v1', '/availability', array(
         'methods' => 'GET',
         'callback' => 'get_practician_availabilities',
         'permission_callback' => '__return_true'
     ));
-
+    register_rest_route('booker67/v1', '/availability/(?P<practician_id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => 'get_practician_availability_by_practician',
+    ));
 // Route pour mettre à jour une disponibilité.
     register_rest_route('booker67/v1', '/availability/(?P<id>\d+)', array(
         'methods' => WP_REST_Server::EDITABLE,
@@ -403,30 +480,37 @@ add_action('rest_api_init', function () {
         'callback' => 'delete_prestation',
 
     ));
-    register_rest_route( 'booker67/v1', '/prestations/(?P<id>\d+)', array(
+    register_rest_route('booker67/v1', '/prestations/(?P<id>\d+)', array(
         'methods' => 'PUT',
         'callback' => 'update_prestation',
         'args' => array(
             'id' => array(
                 'required' => true,
-                'validate_callback' => function( $param, $request, $key ) {
-                    return is_numeric( $param );
+                'validate_callback' => function ($param, $request, $key) {
+                    return is_numeric($param);
                 }
             ),
             'prestation_cost' => array(
                 'required' => true,
-                'validate_callback' => function( $param, $request, $key ) {
-                    return is_numeric( $param );
+                'validate_callback' => function ($param, $request, $key) {
+                    return is_numeric($param);
                 }
             ),
             'prestation_duration' => array(
                 'required' => true,
-                'validate_callback' => function( $param, $request, $key ) {
-                    return preg_match( '/^\d{2}:\d{2}:\d{2}$/', $param );
+                'validate_callback' => function ($param, $request, $key) {
+                    return preg_match('/^\d{2}:\d{2}:\d{2}$/', $param);
                 }
             ),
         ),
-    ) );
+    ));
+
+//endregion
+//region appointement
+    register_rest_route('booker67/v1', '/appointments/(?P<practician_id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => 'get_practician_appointments',
+    ));
 //endregion
 });
 
@@ -437,7 +521,8 @@ add_action('rest_api_init', function () {
  * @param WP_REST_Request $request
  * @return array
  */
-function get_human_ressources_actif(WP_REST_Request $request) {
+function get_human_ressources_actif(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_human_ressources';
     $results = $wpdb->get_results("SELECT id, nom, prenom, role FROM $table_name WHERE actif = 1", ARRAY_A);
@@ -450,7 +535,8 @@ function get_human_ressources_actif(WP_REST_Request $request) {
  * @param WP_REST_Request $request
  * @return array
  */
-function get_human_ressources_inactif(WP_REST_Request $request) {
+function get_human_ressources_inactif(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_human_ressources';
     $results = $wpdb->get_results("SELECT id, nom, prenom, role FROM $table_name WHERE actif = 0", ARRAY_A);
@@ -463,7 +549,8 @@ function get_human_ressources_inactif(WP_REST_Request $request) {
  * @param WP_REST_Request $request
  * @return WP_REST_Response
  */
-function update_human_ressources_status(WP_REST_Request $request) {
+function update_human_ressources_status(WP_REST_Request $request)
+{
     $user_id = $request->get_param('id');
     $status = $request->get_param('actif'); // "actif" ou "inactif"
 
@@ -477,6 +564,7 @@ function update_human_ressources_status(WP_REST_Request $request) {
 
     return new WP_REST_Response(array('status' => 'success'), 200);
 }
+
 //endregion
 //region pratician_availability_callback
 /**
@@ -485,7 +573,8 @@ function update_human_ressources_status(WP_REST_Request $request) {
  * @param WP_REST_Request $request
  * @return WP_REST_Response|WP_Error
  */
-function insert_practician_availability(WP_REST_Request $request) {
+function insert_practician_availability(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'practician_availability';
 
@@ -514,7 +603,8 @@ function insert_practician_availability(WP_REST_Request $request) {
  * @param WP_REST_Request $request
  * @return array
  */
-function get_practician_availabilities(WP_REST_Request $request) {
+function get_practician_availabilities(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'practician_availability';
 
@@ -529,13 +619,32 @@ function get_practician_availabilities(WP_REST_Request $request) {
     return $availabilities;
 }
 
+function get_practician_availability_by_practician($data)
+{
+    global $wpdb;
+    $practician_id = $data['practician_id'];
+    $table_name = $wpdb->prefix . 'practician_availability';
+
+    $results = $wpdb->get_results($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE practician_id = %d",
+        $practician_id
+    ));
+
+    if (empty($results)) {
+        return new WP_Error('no_availability_found', 'Aucune disponibilité trouvée', array('status' => 404));
+    }
+
+    return $results;
+}
+
 /**
  * Met à jour une disponibilité existante d'un praticien.
  *
  * @param array $request
  * @return WP_REST_Response|WP_Error
  */
-function handle_update_availability($request) {
+function handle_update_availability($request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'practician_availability';
 
@@ -572,7 +681,8 @@ function handle_update_availability($request) {
  * @param array $data
  * @return WP_REST_Response|WP_Error
  */
-function delete_availability($data) {
+function delete_availability($data)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'practician_availability';
     $id = $data['id'];
@@ -585,6 +695,7 @@ function delete_availability($data) {
 
     return new WP_REST_Response(true, 200);
 }
+
 //endregion_callback
 //region options_callback
 /**
@@ -592,7 +703,8 @@ function delete_availability($data) {
  *
  * @return array
  */
-function get_all_options() {
+function get_all_options()
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_options';
     $results = $wpdb->get_results("SELECT * FROM $table_name");
@@ -605,7 +717,8 @@ function get_all_options() {
  * @param WP_REST_Request $request
  * @return WP_REST_Response
  */
-function add_options(WP_REST_Request $request) {
+function add_options(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_options';
 
@@ -626,7 +739,8 @@ function add_options(WP_REST_Request $request) {
  * @param WP_REST_Request $request
  * @return WP_REST_Response
  */
-function update_option_by_id(WP_REST_Request $request) {
+function update_option_by_id(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_options';
 
@@ -645,13 +759,15 @@ function update_option_by_id(WP_REST_Request $request) {
 
     return new WP_REST_Response(array('message' => 'Option mise à jour avec succès'), 200);
 }
+
 /**
  * Récupère les options en fonction de leur type générique.
  *
  * @param WP_REST_Request $request La demande WP REST API.
  * @return array Les résultats de la requête.
  */
-function get_options_by_generic_type(WP_REST_Request $request) {
+function get_options_by_generic_type(WP_REST_Request $request)
+{
     // Accès global à l'objet de la base de données de WordPress
     global $wpdb;
     // Définir le nom de la table en utilisant le préfixe défini dans la configuration de WP
@@ -677,7 +793,8 @@ function get_options_by_generic_type(WP_REST_Request $request) {
  * @param WP_REST_Request $request La demande WP REST API.
  * @return array Un tableau associatif contenant le compte.
  */
-function count_options_by_generic_type(WP_REST_Request $request) {
+function count_options_by_generic_type(WP_REST_Request $request)
+{
     // Accès global à l'objet de la base de données de WordPress
     global $wpdb;
     // Définir le nom de la table en utilisant le préfixe défini dans la configuration de WP
@@ -692,9 +809,11 @@ function count_options_by_generic_type(WP_REST_Request $request) {
     // Retourner le compte sous forme de tableau associatif
     return array('count' => intval($count));
 }
+
 //endregion
 //region prestation_callback
-function save_prestation($data) {
+function save_prestation($data)
+{
     global $wpdb;
 
     // Récupération des paramètres de la requête
@@ -705,7 +824,7 @@ function save_prestation($data) {
 
     // Insertion de la prestation dans la table
     $result = $wpdb->insert(
-        $wpdb->prefix .'booker67_prestations',
+        $wpdb->prefix . 'booker67_prestations',
         array(
             'practitioner_id' => $practician_id,
             'prestation_name' => $prestation_name,
@@ -725,10 +844,8 @@ function save_prestation($data) {
 }
 
 
-
-
-
-function get_prestations(WP_REST_Request $request) {
+function get_prestations(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_prestations';
 
@@ -748,7 +865,8 @@ function get_prestations(WP_REST_Request $request) {
     return new WP_REST_Response($results, 200);
 }
 
-function get_prestations_by_practitioner_id(WP_REST_Request $request) {
+function get_prestations_by_practitioner_id(WP_REST_Request $request)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_prestations';
 
@@ -767,7 +885,9 @@ function get_prestations_by_practitioner_id(WP_REST_Request $request) {
     // Retourner une réponse REST API avec les résultats
     return new WP_REST_Response($results, 200);
 }
-function delete_prestation($data) {
+
+function delete_prestation($data)
+{
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'booker67_prestations';
@@ -781,7 +901,9 @@ function delete_prestation($data) {
 
     return new WP_REST_Response('Prestation supprimée avec succès', 200);
 }
-function update_prestation( $data ) {
+
+function update_prestation($data)
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_prestations';
 
@@ -795,40 +917,51 @@ function update_prestation( $data ) {
             'prestation_cost' => $prestation_cost,
             'prestation_duration' => $prestation_duration,
         ),
-        array( 'id' => $prestation_id )
+        array('id' => $prestation_id)
     );
 
-    if ( false === $result ) {
-        return new WP_Error( 'prestation_update_failed', 'Failed to update prestation', array( 'status' => 500 ) );
+    if (false === $result) {
+        return new WP_Error('prestation_update_failed', 'Failed to update prestation', array('status' => 500));
     }
 
-    $prestation = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE id = %d", $prestation_id ), ARRAY_A );
+    $prestation = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $prestation_id), ARRAY_A);
 
-    return new WP_REST_Response( $prestation, 200 );
+    return new WP_REST_Response($prestation, 200);
 }
 
 //endregion
-function booking67_block_init() {
-    //register_block_type( __DIR__ . '/build/dateplanner' );
-    //register_block_type( __DIR__ . '/build/timeselect' );
-     register_block_type( __DIR__ . '/build/planner' );
 
+function get_practician_appointments($data)
+{
+    global $wpdb;
+    $practician_id = $data['practician_id'];
+    $table_name = $wpdb->prefix . 'booker67_rdv';
+
+    // Récupération des enregistrements de la base de données
+    $appointments = $wpdb->get_results(
+        $wpdb->prepare("SELECT * FROM $table_name WHERE practician_id = %d", $practician_id)
+    );
+
+    // Retourner les enregistrements au format JSON
+    return new WP_REST_Response($appointments, 200);
 }
-add_action( 'init', 'booking67_block_init' );
 
-
-function mon_plugin_enqueue_scripts() {
+function mon_plugin_enqueue_scripts()
+{
     // Enregistre nos scripts React (ne les met pas encore en file d'attente)
     wp_register_script('mon-plugin-frontend-js', plugins_url('/build/frontend.js', __FILE__), ['wp-element'], time(), true);
     wp_register_style('mon-plugin-frontend-css', plugins_url('/build/frontend.css', __FILE__));  // Optionnel
 }
+
 add_action('wp_enqueue_scripts', 'mon_plugin_enqueue_scripts');
 
-function booking67_frontend_shortcode() {
+function booking67_frontend_shortcode()
+{
     // Enqueue React scripts and styles
     wp_enqueue_script('mon-plugin-frontend-js');  // Handle que vous avez défini lors de l'enregistrement du script
     wp_enqueue_style('mon-plugin-frontend-css');  // Optionnel: Si vous avez des styles spécifiques pour le frontend
 
     return '<div id="booking67-root"></div>';  // Cette div sera notre point d'ancrage pour React
 }
+
 add_shortcode('booking67_frontend', 'booking67_frontend_shortcode');
