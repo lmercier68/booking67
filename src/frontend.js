@@ -11,7 +11,8 @@ const App = () => {
 
     const [selectedPractitionerId, setSelectedPractitionerId] = useState(0);
     const [selectedPrestationId, setSelectedPrestationId] = useState(0);
-
+const [practician, setPractician] =useState(null)
+    const [prestation, setPrestation] = useState(null)
     const [freeSlots, setFreeSlots] = useState([]);
 
 
@@ -40,12 +41,44 @@ const App = () => {
     });
     const handlePractitionerChange = (id) => {
         setSelectedPractitionerId(id);
+        const url = `/wp-json/booker67/v1/human-ressource/${id}`;
 
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau lors de la récupération des données');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setPractician(data);
+                // Traitez ici les données récupérées
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des données:', error);
+            });
 
     };
 
     const handlePrestationChange = (id) =>{
         setSelectedPrestationId(id);
+        const url = `/wp-json/booker67/v1/prestation/${id}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau lors de la récupération de la prestation');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setPrestation(data)
+                console.log('prestation change choisi: ',prestation)
+                // Traitez ici les données récupérées
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération de la prestation:', error);
+            });
     }
 
     return (
@@ -53,9 +86,10 @@ const App = () => {
             <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange} />
             <PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>
             <WeekSelector onWeekChange={handleWeekChange}/>
-<AvailabilityDisplay selectedPractitionerId={selectedPractitionerId} selectedWeek={selectedWeek}/>
+            {selectedPractitionerId !== 0 && (
+<AvailabilityDisplay practician={practician} prestation={prestation} selectedPractitionerId={selectedPractitionerId}  selectedWeek={selectedWeek}/>
+            )}
 
-            <SemainierController  />
 
         </div>
     );

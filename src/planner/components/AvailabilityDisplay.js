@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import TimeSlot from "./TimeSlot";
+import ScheduleTable from "./ScheduleTable ";
 
-const AvailabilityDisplay = ({ selectedPractitionerId , selectedWeek }) => {
+const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , selectedWeek }) => {
     const [availability, setAvailability] = useState(["e",'r']);
     const [bookedAppointments, setBookedAppointments] = useState([]);
-
+    const [newAppointment, setNewAppointment] = useState(false);
 
 
 
@@ -28,6 +30,7 @@ const AvailabilityDisplay = ({ selectedPractitionerId , selectedWeek }) => {
             fetch(`/wp-json/booker67/v1/availability/${selectedPractitionerId}`)
                 .then(response => response.json())
                 .then(data => {
+
                     // Convertissez les chaînes de date en objets Date
                     const startDate = new Date(selectedWeek.startDate);
                     const endDate = new Date(selectedWeek.endDate);
@@ -37,6 +40,7 @@ const AvailabilityDisplay = ({ selectedPractitionerId , selectedWeek }) => {
                     const freeSlots = calculateFreeSlots(data, bookedAppointments, weekDates);
                     // Filtrer les créneaux pour la semaine sélectionnée
                     const slotsForWeek = filterSlotsForWeek(freeSlots, startDate, endDate, weekDates);
+
                     setAvailability(slotsForWeek);
                 })
                 .catch(error => {
@@ -70,8 +74,7 @@ const AvailabilityDisplay = ({ selectedPractitionerId , selectedWeek }) => {
                 availabilityMap.set(dayName, daySlots);
             }
         });
-        console.log('Disponibilités :', availability);
-        console.log('Disponibilités map:', availabilityMap);
+
         // Filtrer les créneaux occupés par les rendez-vous
         appointments.forEach(appointment => {
             let appointmentStart = new Date(appointment.rdv_dateTime);
@@ -87,24 +90,17 @@ const AvailabilityDisplay = ({ selectedPractitionerId , selectedWeek }) => {
             let dayName = appointmentStart.toLocaleDateString('fr-FR', { weekday: 'long' });
             dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
 
-            console.log('Clés dans availabilityMap:', [...availabilityMap.keys()]);
-            console.log('Clé recherchée:', dayName);
             let daySlots = availabilityMap.get(dayName);
 
-            console.log('test1: ', appointmentStart.toLocaleDateString('fr-FR', { weekday: 'long' }));
-            console.log('test2: ', weekDates);
-            console.log('test3: ', daySlots);
-            console.log('test31: ', appointmentStart);
-            console.log('test32: ', appointmentEnd);
 
             if (daySlots) {
-                console.log('test4: ', daySlots);
+
                 availabilityMap.set(dayName, daySlots.filter(slot =>
                     slot < appointmentStart || slot >= appointmentEnd
                 ));
             }
         });
-console.log(availabilityMap)
+
         // Convertir la carte en liste de créneaux libres
         availabilityMap.forEach((slots, day) => {
             slots.forEach(slot => {
@@ -112,7 +108,7 @@ console.log(availabilityMap)
                 freeSlots.push({ day: day, date: slotDate, time: slot.toLocaleTimeString('fr-FR') });
             });
         });
-console.log('freeSlots : ' ,freeSlots)
+
         return freeSlots;
     };
     const getWeekDates = (startDate) => {
@@ -127,18 +123,14 @@ console.log('freeSlots : ' ,freeSlots)
             let date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
             let dayName = date.toLocaleDateString('fr-FR', { weekday: 'long' });
-            console.log('day:', days[i])
             dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-            console.log('dayName: ' , dayName);
             weekDates.set(dayName, date);
         }
 
         return weekDates;
     };
     const filterSlotsForWeek = (slots, startDate, endDate, weekDates) => {
-        console.log('slots filterslotsweek', slots)
-        console.log('startDate filterslotsweek', startDate)
-        console.log('endDate filterslotsweek', endDate)
+
         return slots.filter(slot => {
             const slotDate = weekDates.get(slot.day);
             return slotDate && slotDate >= startDate && slotDate <= endDate;
@@ -152,15 +144,29 @@ console.log('freeSlots : ' ,freeSlots)
     // Filtrer les créneaux pour la semaine sélectionnée
     const slotsForWeek = filterSlotsForWeek(availability, startDate, endDate, weekDates);
 
-    console.log('slots slotsForWeek', slotsForWeek)
+
+
+    const slotsByDay = slotsForWeek.reduce((acc, slot) => {
+        acc[slot.day] = acc[slot.day] || [];
+        acc[slot.day].push({ ...slot, isAvailable: true }); // Supposons que tous les créneaux sont disponibles
+        return acc;
+    }, {});
+
+    const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+
+
     return (
         <div>
-            {slotsForWeek.length > 0 ? (
-                slotsForWeek.map((slot, index) => (
-                    <div key={index}>
-                        {slot.day} -  {slot.date} - {slot.time}
-                    </div>
-                ))
+            {availability.length > 0 ? (
+                <ScheduleTable
+                    slotsByDay={slotsByDay}
+                    practician={practician}
+                    prestation={prestation}
+                    selectedWeek={selectedWeek}
+                    setNewAppointment={setNewAppointment}
+                    daysOfWeek={daysOfWeek}
+                />
             ) : (
                 <p>Aucun créneau disponible pour cette semaine.</p>
             )}

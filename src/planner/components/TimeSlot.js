@@ -1,15 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Modal_Appointment_Validation from "./Modal_Appointment_Validation";
 
-function TimeSlot({ start, duration, onClick }) {
+function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment,slotsByDay}) {
+    const [isSelected, setIsSelected] = useState(false);
+    const [dateTimeSlot, setDateTimeSlot] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+
+    if (!slot) {
+        return null;
+    }
+    const { time, isAvailable } = slot;
+
+    // Formatage de l'heure pour afficher hh:mm
+    const formattedTime = new Date('1970-01-01T' + time).toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+
+
     const handleClick = () => {
-        console.log(`Plage horaire de ${start} pour une durée de ${duration} minutes cliquée.`);
-        onClick();
+        if (isAvailable && !isModalOpen) {
+            setDateTimeSlot(slot);
+            setIsModalOpen(true); // Ouvrir la modale
+            setIsSelected(true);
+            console.log(`Plage horaire de ${time} pour une durée de X minutes cliquée.`);
+        }
     };
 
+    const handleBlur = () => {
+        setIsSelected(false);
+    };
+
+    const slotStyle = {
+        cursor: 'pointer',
+        padding: '5px',
+        border: '1px solid #ccc',
+        backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : 'red'
+    };
+const modalClose=(e)=>{
+
+     setIsModalOpen(false)
+}
     return (
-        <div onClick={handleClick} style={{ cursor: 'pointer', padding: '5px', border: '1px solid #ccc' }}>
-            {start}
+        <div onClick={handleClick} onBlur={handleBlur} tabIndex={0} style={slotStyle}>
+            {formattedTime}
+            {isModalOpen && (
+                <Modal_Appointment_Validation
+                    // ... passer les props nécessaires ...
+                    onClose={modalClose}
+
+                    slot={slot}
+                    setNewAppointment={setNewAppointment}
+                    practician={practician}
+                    prestation={prestation}
+                    selectedWeek={selectedWeek}
+                    dateTimeSlot={dateTimeSlot}
+                />
+            )}
         </div>
     );
 }
-export  default  TimeSlot;
+
+export default TimeSlot;

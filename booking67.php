@@ -365,6 +365,11 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'update_human_ressources_status'
     ));
+    register_rest_route('booker67/v1', '/human-ressource/(?P<id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => 'get_human_ressource_by_id',
+        'permission_callback' => '__return_true' // Vous pouvez également définir une fonction de rappel de permission ici
+    ));
 //endregion
 //region availability
 // Route pour insérer une nouvelle disponibilité pour un praticien.
@@ -504,7 +509,11 @@ add_action('rest_api_init', function () {
             ),
         ),
     ));
-
+    register_rest_route('booker67/v1', '/prestation/(?P<id>\d+)', array(
+        'methods' => 'GET',
+        'callback' => 'get_prestation_by_id',
+        'permission_callback' => '__return_true'
+    ));
 //endregion
 //region appointement
     register_rest_route('booker67/v1', '/appointments/(?P<practician_id>\d+)', array(
@@ -564,7 +573,19 @@ function update_human_ressources_status(WP_REST_Request $request)
 
     return new WP_REST_Response(array('status' => 'success'), 200);
 }
+function get_human_ressource_by_id($data) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $id = $data['id'];
 
+    $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
+
+    if (is_null($result)) {
+        return new WP_Error('no_human_ressource', 'Aucune ressource humaine trouvée avec cet ID', array('status' => 404));
+    }
+
+    return new WP_REST_Response($result, 200);
+}
 //endregion
 //region pratician_availability_callback
 /**
@@ -928,7 +949,19 @@ function update_prestation($data)
 
     return new WP_REST_Response($prestation, 200);
 }
+function get_prestation_by_id($data) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $id = $data['id'];
 
+    $prestation = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
+
+    if (is_null($prestation)) {
+        return new WP_Error('no_prestation', 'Aucune prestation trouvée avec cet ID', array('status' => 404));
+    }
+
+    return new WP_REST_Response($prestation, 200);
+}
 //endregion
 
 function get_practician_appointments($data)
