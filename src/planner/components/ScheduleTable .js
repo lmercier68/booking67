@@ -15,10 +15,26 @@ const getAllUniqueTimes = (slotsByDay) => {
 };
 const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
+    const headerStyle = {
+        textAlign: 'center', // Centre le texte
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* Ombre */
+        borderRadius: '10px', /* Bordures arrondies */
+        border: '2px',
+    };
+    const tableStyle = {
+        width: '100%', // Utiliser toute la largeur disponible
+        tableLayout: 'fixed', // Colonnes de largeur égale
+    };
 
+    // Style pour les cellules et en-têtes
+    const cellStyle = {
+        width: `${100 / daysOfWeek.length}%`, // Répartir la largeur uniformément
+        textAlign: 'center',
+        fontWeight: 'bold'
+    };
     return (
-        <table>
-            <thead>
+        <table style={tableStyle}>
+            <thead style={headerStyle}>
             <tr>
                 {daysOfWeek.map(day => <th key={day}>{day}</th>)}
             </tr>
@@ -29,7 +45,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                     {daysOfWeek.map(day => {
                         const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
                         return (
-                            <td key={day}>
+                            <td key={day} style={cellStyle}>
                                 <TimeSlot slotsByDay={slotsByDay[day]}
                                           slot={slot}
                                           setNewAppointment={setNewAppointment}

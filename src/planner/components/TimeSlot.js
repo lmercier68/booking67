@@ -37,8 +37,11 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
     const slotStyle = {
         cursor: 'pointer',
         padding: '5px',
-        border: '1px solid #ccc',
-        backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : 'red'
+
+        backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : 'red',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* Ombre */
+        borderRadius: '10px', /* Bordures arrondies */
+        border: '2px solid #ccc',
     };
 const modalClose=(e)=>{
 

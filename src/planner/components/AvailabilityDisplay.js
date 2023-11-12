@@ -7,8 +7,9 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
 
+    useEffect(() => {
 
-
+    }, [newAppointment]);
     useEffect(() => {
         if(selectedPractitionerId!==0) {
             // Fetch booked appointments
