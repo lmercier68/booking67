@@ -20,6 +20,11 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
     const [dateTimeSlot, setDateTimeSlot] = useState(null);
+    const [timeOfDay, setTimeOfDay] = useState('AM');
+    const handleTimeSelection = (selectedTime) => {
+        setTimeOfDay(selectedTime);
+        // Vous pouvez également effectuer d'autres actions ici si nécessaire
+    };
     function addNewRdv(practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId) {
         // L'URL de l'API (remplacer 'votre-site.com' par l'URL réelle de votre site WordPress)
         const apiUrl = '/wp-json/booker67/v1/add-rdv/';
@@ -207,7 +212,7 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
         <div>
             {availability.length > 0 ? (
                 <div>
-                <AmpmSelector />
+                <AmpmSelector onSelectionChange={handleTimeSelection} />
                 <ScheduleTable
                     slotsByDay={slotsByDay}
                     practician={practician}
@@ -217,6 +222,7 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
                     daysOfWeek={daysOfWeek}
                 dateTimeSlot={dateTimeSlot}
                 setDateTimeSlot={setDateTimeSlot}
+                    timeOfDay={timeOfDay}
                 /></div>
             ) : (
                 <p>Aucun créneau disponible pour cette semaine.</p>
