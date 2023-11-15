@@ -5,9 +5,35 @@ import HumanRessourcesActifSelect from "./planner/components/humanactiflist_fron
 import SemainierController from "./planner/components/SemainierController";
 import AvailabilityDisplay from "./planner/components/AvailabilityDisplay";
 import WeekSelector from "./planner/components/weekSelector";
+import fetchOptions from "../components/src/components/scripts/fetchOptions";
 
 const App = () => {
-    // Fonction pour générer les plages horaires d'une journée
+    const [options, setOptions] = useState({
+        hasFixedTimeSlots: false,
+        slotDuration: 0,
+        multipleAppointments: false,
+        maxAppointments: 0,
+        multiplePracticians: false,
+        multiPrestations: false,
+        indicateNumberOfParticipants: false,
+        allowObservations: false
+    });
+    useEffect(() => {
+        fetchOptions(['genType_hasFixedTimeSlots', 'genType_multipleAppointments','genType_slotDuration','genType_maxAppointments','genType_multiplePracticians','genType_multiPrestations','genType_indicateNumberOfParticipants','genType_allowObservations']).then(data => {
+
+            setOptions(transformFetchedOptions(data));
+        });
+
+
+    }, []);
+    const transformFetchedOptions = (fetchedOptions) => {
+        let newOptions = { ...options };
+        fetchedOptions.forEach(opt => {
+            const key = opt.generic_type.replace('genType_', '');
+            newOptions[key] = (opt.value === 'true' || opt.value === 'false') ? opt.value === 'true' : opt.value;
+        });
+        return newOptions;
+    };
 
     const [selectedPractitionerId, setSelectedPractitionerId] = useState(0);
     const [selectedPrestationId, setSelectedPrestationId] = useState(0);
@@ -83,11 +109,11 @@ const [practician, setPractician] =useState(null)
 
     return (
         <div>
-            <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange} />
-            <PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>
+            {options.multiplePracticians &&  <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange} />}
+            {options.multiPrestations &&<PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>}
             <WeekSelector onWeekChange={handleWeekChange}/>
             {selectedPractitionerId !== 0 && (
-<AvailabilityDisplay practician={practician} prestation={prestation} selectedPractitionerId={selectedPractitionerId}  selectedWeek={selectedWeek}/>
+<AvailabilityDisplay options={options} practician={practician} prestation={prestation} selectedPractitionerId={selectedPractitionerId}  selectedWeek={selectedWeek}/>
             )}
 
 

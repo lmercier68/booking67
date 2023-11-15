@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TimeSlot from "./TimeSlot";
 import ScheduleTable from "./ScheduleTable ";
 import AmpmSelector from "./AmpmSelector";
+import {ensureNumber} from "@wordpress/components/build-types/utils/values";
 
 
 function createDateTime( date, time ) {
@@ -15,7 +16,9 @@ function createDateTime( date, time ) {
     // Créer l'objet Date
     return new Date(dateTimeString);
 }
-const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , selectedWeek }) => {
+const AvailabilityDisplay = ({options,practician,prestation, selectedPractitionerId , selectedWeek }) => {
+    //si le praticien n'est pas selectionner et qu'il n'y a qu'un seul praticien on selectionne le premier praticien
+
     const [availability, setAvailability] = useState(["e",'r']);
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
@@ -57,6 +60,7 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
             });
     }
     useEffect(() => {
+
         if(newAppointment){
             addNewRdv(practician.id,prestation.id,prestation.prestation_duration,createDateTime(dateTimeSlot.date,dateTimeSlot.time),1)
         }
@@ -119,7 +123,7 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
                 let daySlots = [];
                 while (openTime < closeTime) {
                     daySlots.push(new Date(openTime));
-                    openTime.setMinutes(openTime.getMinutes() + 30); // Supposons des créneaux de 30 minutes
+                    openTime.setMinutes(openTime.getMinutes() + parseInt(options.slotDuration)); // Supposons des créneaux de 30 minutes
                 }
 
                 // Utiliser dayName comme clé dans availabilityMap

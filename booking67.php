@@ -142,9 +142,13 @@ function booker67_enqueue_public_scripts()
         filemtime(plugin_dir_path(__FILE__) . 'build/frontend.js'),
         true
     );
+
 }
 
 add_action('wp_enqueue_scripts', 'booker67_enqueue_public_scripts');
+
+
+
 //region database_table_creation
 // Création de la table "booker67_human_ressource" lors de l'activation du plugin
 function create_booking67_human_ressources_table()
@@ -438,13 +442,27 @@ add_action('rest_api_init', function () {
         'methods' => 'GET',
         'callback' => 'get_all_options'
     ));
+    register_rest_route('booker67/v1', '/options/filter', array(
+        'methods' => 'GET',
+        'callback' => 'get_filtered_options',
+        'args' => array(
+            'types' => array(
+                'required' => false,
+                'default' => array(),
+                'sanitize_callback' => 'wp_parse_slug_list'
+            )
+        )
+    ));
 
     /* Route pour ajouter une nouvelle option.*/
     register_rest_route('booker67/v1', '/options', array(
         'methods' => 'POST',
         'callback' => 'add_options'
     ));
-
+    register_rest_route('booker67/v1', '/multiOptions', array(
+        'methods' => 'POST',
+        'callback' => 'add_multiOptions'
+    ));
     /* Route pour mettre à jour une option en utilisant son ID.*/
     register_rest_route('booker67/v1', '/options/(?P<id>\d+)', array(
         'methods' => 'POST',
@@ -735,7 +753,28 @@ function get_all_options()
     $results = $wpdb->get_results("SELECT * FROM $table_name");
     return $results;
 }
+function get_filtered_options(WP_REST_Request $request)
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_options';
 
+    // Récupérer les types des paramètres de la requête
+    $types = $request->get_param('types');
+
+    // Construire la requête SQL
+    $sql = "SELECT * FROM $table_name";
+    if (!empty($types)) {
+        $placeholders = array_fill(0, count($types), '%s');
+        $placeholders = implode(',', $placeholders);
+        $sql .= $wpdb->prepare(" WHERE generic_type IN ($placeholders)", $types);
+    }
+
+    // Exécuter la requête
+    $results = $wpdb->get_results($sql);
+
+    // Retourner les résultats
+    return new WP_REST_Response($results, 200);
+}
 /**
  * Ajoute une nouvelle option.
  *
@@ -756,6 +795,33 @@ function add_options(WP_REST_Request $request)
     ));
 
     return new WP_REST_Response(array('message' => 'Option ajoutée avec succès'), 200);
+}
+function add_multiOptions($request) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booker67_options';
+
+    $data = $request->get_json_params();
+    foreach ($data as $key => $value) {
+        // Ajouter le préfixe "genType_" à chaque clé
+        $option_name = 'genType_' . $key;
+
+        // Vérifier si l'option existe déjà
+        $existing = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table_name WHERE generic_type = %s", $option_name));
+
+        // Préparer les données pour l'insertion ou la mise à jour
+        $option_data = array('generic_type' => $option_name, 'value' => maybe_serialize($value));
+        $format = array('%s', '%s');
+
+        if ($existing) {
+            // Mettre à jour l'option existante
+            $wpdb->update($table_name, $option_data, array('id' => $existing), $format, array('%d'));
+        } else {
+            // Insérer une nouvelle option
+            $wpdb->insert($table_name, $option_data, $format);
+        }
+    }
+
+    return new WP_REST_Response('Options enregistrées avec succès', 200);
 }
 
 /**
