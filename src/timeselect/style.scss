@@ -1,0 +1,138 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-create-block-booker67 {
+	background-color: #21759b;
+	color: #fff;
+	padding: 2px;
+}
+.booker67-calendar {
+	width: 100%;
+	border-collapse: collapse;
+
+	th, td {
+		border: 1px solid #ccc;
+		padding: 10px;
+		text-align: center;
+	}
+
+	.booker67-day {
+		background-color: #e0f7fa;
+
+		a {
+			color: #0077b6;
+			text-decoration: none;
+		}
+	}
+
+	.booker67-day-disabled {
+		background-color: #eceff1;
+		color: #999;
+	}
+
+	.booker67-day-empty {
+		background-color: #f5f5f5;
+	}
+	.booker67-today a {
+		display: inline-block;
+		border-radius: 50%;  // rend le contour rond
+		border: 2px solid red;  // contour rouge
+		padding: 8px;  // ajustement pour conserver une bonne taille pour le numéro du jour
+	}
+}
+.timeslot-dropdown {
+	list-style-type: none;
+	padding: 10px;
+	background-color: white;
+	border: 1px solid #ccc;
+	position: absolute;
+	z-index: 1000;
+	box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+	max-height: 200px;
+	overflow-y: auto;
+	width: 100px;
+}
+
+.timeslot-dropdown li {
+	padding: 5px;
+	cursor: pointer;
+	border-bottom: 1px solid #f1f1f1;
+}
+
+.timeslot-dropdown li:last-child {
+	border-bottom: none;
+}
+
+.timeslot-dropdown li:hover {
+	background-color: #f6f6f6;
+}
+.time-slot-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.time-slot-table th,
+.time-slot-table td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	text-align: center;
+}
+
+.time-slot-table th {
+	background-color: #f5f5f5;
+}
+.booker67-day-available {
+	cursor: pointer;
+	background-color: #e0f7fa;  // Un arrière-plan légèrement différent pour indiquer qu'il est cliquable
+}
+.timeslot-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px;
+	background-color: white;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+	z-index: 1000; // Assurez-vous qu'il s'affiche au-dessus des autres éléments
+	max-width: 400px;
+	width: 90%;
+	border-radius: 8px;
+
+	h4 {
+		margin-top: 0;
+		text-align: center;
+		border-bottom: 1px solid #eee;
+		padding-bottom: 10px;
+	}
+
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 15px 0;
+
+		li {
+			padding: 5px 0;
+			text-align: center;
+			font-size: 1rem;
+		}
+	}
+
+	.timeslot-close-btn {
+		display: block;
+		margin: 20px auto;
+		padding: 10px 20px;
+		cursor: pointer;
+		background-color: #f5f5f5;
+		border: none;
+		border-radius: 4px;
+		transition: background-color 0.3s;
+
+		&:hover {
+			background-color: #e5e5e5;
+		}
+	}
+}

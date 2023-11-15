@@ -35,8 +35,9 @@ export const SelectionProvider = ({ children }) => {
 			});
 	};
 	const handleHumanRessourceChange = (event) => {  // Modifiez le paramètre pour être l'événement
-
+		console.log('tt');
 		const selectedValue = event.target.value;  // Accédez à la valeur sélectionnée depuis l'événement
+		console.log(selectedValue);
 		console.log('handleHumanRessourceChange triggered with selectedValue:', selectedValue);
 
 

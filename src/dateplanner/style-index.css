@@ -1,0 +1,68 @@
+.timeslot-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 400px;
+  width: 90%;
+  border-radius: 8px;
+}
+.timeslot-modal h4 {
+  margin-top: 0;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+.timeslot-modal ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 15px 0;
+}
+.timeslot-modal ul li {
+  padding: 5px 0;
+  text-align: center;
+  font-size: 1rem;
+}
+.timeslot-modal .timeslot-close-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+.timeslot-modal .timeslot-close-btn:hover {
+  background-color: #e5e5e5;
+}
+
+.booker67-calendar th, .booker67-calendar td {
+  border: 1px solid #e5e5e5;
+  text-align: center;
+  padding: 5px 10px;
+}
+.booker67-calendar .booker67-day {
+  cursor: default;
+}
+.booker67-calendar .booker67-day a {
+  text-decoration: none;
+  color: inherit;
+}
+.booker67-calendar .booker67-day.booker67-day-available {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+.booker67-calendar .booker67-day.booker67-day-available a {
+  color: #0073aa;
+}
+.booker67-calendar .booker67-day.booker67-today {
+  border: 2px solid red;
+  box-sizing: border-box;
+}
+
+/*# sourceMappingURL=style-index.css.map */

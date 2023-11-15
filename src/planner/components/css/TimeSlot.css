@@ -1,0 +1,8 @@
+.time-slot {
+    border: 1px solid #ddd;
+    margin: 4px;
+    padding: 8px;
+    overflow: hidden; /* pour gérer le contenu qui dépasse */
+    cursor: pointer; /* si clicquable */
+    /* Ajouter d'autres styles selon les besoins */
+}
