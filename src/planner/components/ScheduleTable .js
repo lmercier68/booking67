@@ -13,7 +13,7 @@ const getAllUniqueTimes = (slotsByDay) => {
 
     return Array.from(allTimes).sort(); // Trier les heures si nécessaire
 };
-const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment}) => {
+const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
     const headerStyle = {
         textAlign: 'center', // Centre le texte
@@ -46,12 +46,14 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                         const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
                         return (
                             <td key={day} style={cellStyle}>
-                                <TimeSlot slotsByDay={slotsByDay[day]}
+                                <TimeSlot
                                           slot={slot}
                                           setNewAppointment={setNewAppointment}
                                           practician={practician}
                                           prestation={prestation}
                                           selectedWeek={selectedWeek}
+                                          dateTimeSlot={dateTimeSlot}
+                                          setDateTimeSlot={setDateTimeSlot}
                                 />
                             </td>
                         );

@@ -520,6 +520,10 @@ add_action('rest_api_init', function () {
         'methods' => 'GET',
         'callback' => 'get_practician_appointments',
     ));
+    register_rest_route('booker67/v1', '/add-rdv/', array(
+        'methods' => 'POST',
+        'callback' => 'api_add_rdv',
+    ));
 //endregion
 });
 
@@ -978,7 +982,42 @@ function get_practician_appointments($data)
     // Retourner les enregistrements au format JSON
     return new WP_REST_Response($appointments, 200);
 }
+function api_add_rdv($request) {
+    global $wpdb; // Accès global à l'objet $wpdb
 
+    // Récupération des paramètres de la requête
+    $params = $request->get_json_params();
+    $practician_id = $params['practician_id'];
+    $prestation_id = $params['prestation_id'];
+    $prestation_duration = $params['prestation_duration'];
+    $rdv_dateTime = $params['rdv_dateTime'];
+    $rdv_status = $params['rdv_status'];
+    $customer_id = $params['customer_id'];
+
+    // Nom de la table
+    $table_name = $wpdb->prefix . 'booker67_rdv';
+
+    // Insertion dans la base de données
+    $result = $wpdb->insert(
+        $table_name,
+        array(
+            'practician_id' => $practician_id,
+            'prestation_id' => $prestation_id,
+            'prestation_duration' => $prestation_duration,
+            'rdv_dateTime' => $rdv_dateTime,
+            'rdv_status' => $rdv_status,
+            'customer_id' => $customer_id
+        ),
+        array('%d', '%d', '%s', '%s', '%d', '%d')
+    );
+
+    // Vérification du résultat de l'insertion
+    if ($result) {
+        return new WP_REST_Response('Rendez-vous ajouté avec succès', 200);
+    } else {
+        return new WP_REST_Response('Erreur lors de l\'ajout du rendez-vous', 500);
+    }
+}
 function mon_plugin_enqueue_scripts()
 {
     // Enregistre nos scripts React (ne les met pas encore en file d'attente)

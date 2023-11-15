@@ -1,14 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import TimeSlot from "./TimeSlot";
 import ScheduleTable from "./ScheduleTable ";
+import AmpmSelector from "./AmpmSelector";
 
+
+function createDateTime( date, time ) {
+    // Convertir la date au format YYYY-MM-DD
+    const [day, month, year] = date.split('/');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Combinaison de la date formatée et de l'heure
+    const dateTimeString = `${formattedDate}T${time}`;
+
+    // Créer l'objet Date
+    return new Date(dateTimeString);
+}
 const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , selectedWeek }) => {
     const [availability, setAvailability] = useState(["e",'r']);
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
+    const [dateTimeSlot, setDateTimeSlot] = useState(null);
+    function addNewRdv(practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId) {
+        // L'URL de l'API (remplacer 'votre-site.com' par l'URL réelle de votre site WordPress)
+        const apiUrl = '/wp-json/booker67/v1/add-rdv/';
 
+        // Création du corps de la requête
+        const data = {
+            practician_id: practicianId,
+            prestation_id: prestationId,
+            prestation_duration: prestationDuration,
+            rdv_dateTime: rdvDateTime,
+            rdv_status: 1,
+            customer_id: customerId
+        };
+
+        // Envoi de la requête POST
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // Si nécessaire, ajoutez ici des en-têtes supplémentaires, comme les en-têtes d'authentification
+            },
+            body: JSON.stringify(data) // Conversion de l'objet de données en chaîne JSON
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Succès:', data);
+            })
+            .catch((error) => {
+                console.error('Erreur:', error);
+            });
+    }
     useEffect(() => {
-
+        if(newAppointment){
+            addNewRdv(practician.id,prestation.id,prestation.prestation_duration,createDateTime(dateTimeSlot.date,dateTimeSlot.time),1)
+        }
     }, [newAppointment]);
     useEffect(() => {
         if(selectedPractitionerId!==0) {
@@ -160,6 +206,8 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
     return (
         <div>
             {availability.length > 0 ? (
+                <div>
+                <AmpmSelector />
                 <ScheduleTable
                     slotsByDay={slotsByDay}
                     practician={practician}
@@ -167,7 +215,9 @@ const AvailabilityDisplay = ({practician,prestation, selectedPractitionerId , se
                     selectedWeek={selectedWeek}
                     setNewAppointment={setNewAppointment}
                     daysOfWeek={daysOfWeek}
-                />
+                dateTimeSlot={dateTimeSlot}
+                setDateTimeSlot={setDateTimeSlot}
+                /></div>
             ) : (
                 <p>Aucun créneau disponible pour cette semaine.</p>
             )}

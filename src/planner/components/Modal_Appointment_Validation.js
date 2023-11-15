@@ -4,7 +4,8 @@ const Modal_Appointment_Validation = ({dateTimeSlot,
                                           selectedWeek,
                                           setNewAppointment,
                                           slot,
-                                          onClose }) => {
+                                          onClose
+                                          }) => {
     console.log(dateTimeSlot)
     const buttonStyleValid = {
         backgroundColor: '#4CAF50', // Couleur de fond verte
