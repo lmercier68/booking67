@@ -43,6 +43,10 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
         borderRadius: '10px', /* Bordures arrondies */
         border: '2px solid #ccc',
     };
+    console.log('selectedWeek: ',selectedWeek)
+    console.log('dateTimeSlot',dateTimeSlot)
+    console.log('practician',practician)
+    console.log('prestation',prestation)
 const modalClose=(e)=>{
 
      setIsModalOpen(false)
@@ -50,11 +54,10 @@ const modalClose=(e)=>{
     return (
         <div onClick={handleClick} onBlur={handleBlur} tabIndex={0} style={slotStyle}>
             {formattedTime}
-            {isModalOpen && (
-                <Modal_Appointment_Validation
-                    // ... passer les props nécessaires ...
-                    onClose={modalClose}
 
+                {isModalOpen && (
+                <Modal_Appointment_Validation
+                    onClose={modalClose}
                     slot={slot}
                     setNewAppointment={setNewAppointment}
                     practician={practician}

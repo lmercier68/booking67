@@ -50,7 +50,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                         const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
                         return (
                             <td key={day} style={cellStyle}>
-                                <TimeSlot
+                                 <TimeSlot
                                           slot={slot}
                                           setNewAppointment={setNewAppointment}
                                           practician={practician}
@@ -59,6 +59,10 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                                           dateTimeSlot={dateTimeSlot}
                                           setDateTimeSlot={setDateTimeSlot}
                                 />
+
+
+
+
                             </td>
                         );
                     })}

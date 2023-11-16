@@ -11,25 +11,29 @@ function PrestationSelect({practitionerId,onPrestationChange}) {
     };
 
     useEffect(() => {
-        // Construire l'URL en fonction de l'existence de practitionerId
-        let url = '/wp-json/booker67/v1/prestations';
-        if (practitionerId) {
-            url += `/practitioner_id/${practitionerId}`;
-        }
+        const fetchPrestations = async () => {
+            // Construire l'URL en fonction de l'existence de practitionerId
+            if(practitionerId !== 0 && practitionerId !== undefined) {
+                let url = '/wp-json/booker67/v1/prestations';
+                if (practitionerId) {
+                    url += `/practitioner_id/${practitionerId}`;
+                }
+                console.log('recuperation des prestation pour l"id: ', practitionerId);
 
-        // Effectuer une requête AJAX pour obtenir la liste des prestations
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                setPrestations(data);
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    console.log('prestation recupérée : ', data);
+                    setPrestations(data);
+                } catch (error) {
+                    console.error('Erreur lors de la récupération des prestations:', error);
+                }
+            }
+        };
 
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des prestations:', error);
+        fetchPrestations();
+    }, [practitionerId]);
 
-            });
-
-    }, [practitionerId]); // Ajouter practitionerId comme dépendance pour relancer l'effet si cela change
     console.log('prestations for practician: ' ,prestations)
     return (
         <select onChange={handleChange}>

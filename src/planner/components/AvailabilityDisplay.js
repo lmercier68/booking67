@@ -17,7 +17,7 @@ function createDateTime( date, time ) {
     return new Date(dateTimeString);
 }
 const AvailabilityDisplay = ({options,practician,prestation, selectedPractitionerId , selectedWeek }) => {
-    //si le praticien n'est pas selectionner et qu'il n'y a qu'un seul praticien on selectionne le premier praticien
+
 
     const [availability, setAvailability] = useState(["e",'r']);
     const [bookedAppointments, setBookedAppointments] = useState([]);
@@ -28,7 +28,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
         setTimeOfDay(selectedTime);
         // Vous pouvez également effectuer d'autres actions ici si nécessaire
     };
-    function addNewRdv(practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId) {
+    const addNewRdv = async (practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId) => {
         // L'URL de l'API (remplacer 'votre-site.com' par l'URL réelle de votre site WordPress)
         const apiUrl = '/wp-json/booker67/v1/add-rdv/';
 
@@ -43,51 +43,73 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
         };
 
         // Envoi de la requête POST
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-                // Si nécessaire, ajoutez ici des en-têtes supplémentaires, comme les en-têtes d'authentification
-            },
-            body: JSON.stringify(data) // Conversion de l'objet de données en chaîne JSON
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Succès:', data);
-            })
-            .catch((error) => {
-                console.error('Erreur:', error);
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // ... autres en-têtes ...
+                },
+                body: JSON.stringify(data)
             });
-    }
+            const responseData = await response.json();
+            console.log('Succès:', responseData);
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    };
     useEffect(() => {
-
+        console.log('useEffect0-1')
         if(newAppointment){
             addNewRdv(practician.id,prestation.id,prestation.prestation_duration,createDateTime(dateTimeSlot.date,dateTimeSlot.time),1)
         }
+        console.log('useEffect0-2')
     }, [newAppointment]);
-    useEffect(() => {
-        if(selectedPractitionerId!==0) {
-            // Fetch booked appointments
-            fetch(`/wp-json/booker67/v1/appointments/${selectedPractitionerId}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('appoitements: ',  data)
-                    setBookedAppointments(data);
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la récupération des rendez-vous:', error);
-                });
 
+    useEffect(() => {
+        console.log('fetch appointments')
+        const fetchBookedAppointments = async () => {
+        console.log('useEffect1-1')
+        if((selectedPractitionerId && selectedPractitionerId!==0)|| (!options.multiplePracticians && selectedPractitionerId===1)) {
+            console.log('practionner_id useeffect: ' ,selectedPractitionerId)
+            let pract_id=0
+            if(!options.multiplePracticians){
+                  pract_id= 1
+            }else {
+                pract_id = selectedPractitionerId
+            }
+            console.log('pract_id', pract_id)
+            // Fetch booked appointments
+            try {
+                const response = await fetch(`/wp-json/booker67/v1/appointments/${pract_id}`);
+                const data = await response.json();
+                console.log('appoitements: ', data);
+                setBookedAppointments(data);
+                // ... autres opérations ...
+            } catch (error) {
+                console.error('Erreur lors de la récupération des rendez-vous:', error);
+            }
         }
+        };
+        fetchBookedAppointments();
+
     }, [selectedPractitionerId]);
 
-    useEffect(() => {
-        if (selectedPractitionerId !== 0) {
-            fetch(`/wp-json/booker67/v1/availability/${selectedPractitionerId}`)
-                .then(response => response.json())
-                .then(data => {
 
-                    // Convertissez les chaînes de date en objets Date
+
+    useEffect(() => {
+        console.log('fetch availability')
+        console.log('fetch avail pratci: ', selectedPractitionerId)
+        const fetchAvailability = async () => {
+            if ((selectedPractitionerId && selectedPractitionerId !== 0 )) {
+                console.log('useEffect2-1');
+                console.log('selectedPractitionerId',selectedPractitionerId);
+                try {
+                    const response = await fetch(`/wp-json/booker67/v1/availability/${selectedPractitionerId}`);
+                    const data = await response.json();
+                    console.log('useEffect2-2 data: ', data);
+
+                    // Convertir les chaînes de date en objets Date
                     const startDate = new Date(selectedWeek.startDate);
                     const endDate = new Date(selectedWeek.endDate);
                     // Générer les dates pour chaque jour de la semaine sélectionnée
@@ -98,11 +120,13 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
                     const slotsForWeek = filterSlotsForWeek(freeSlots, startDate, endDate, weekDates);
 
                     setAvailability(slotsForWeek);
-                })
-                .catch(error => {
+                    console.log('useEffect2-3 slotForWeek', slotsForWeek);
+                } catch (error) {
                     console.error('Erreur lors de la récupération des disponibilités:', error);
-                });
-        }
+                }
+            }
+        };
+        fetchAvailability();
     }, [selectedPractitionerId, bookedAppointments, selectedWeek]);
 
     const calculateFreeSlots = (availability, appointments, weekDates) => {
@@ -215,9 +239,9 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
     return (
         <div>
             {availability.length > 0 ? (
-                <div>
-                <AmpmSelector onSelectionChange={handleTimeSelection} />
-                <ScheduleTable
+                <div> horaires
+                      <AmpmSelector onSelectionChange={handleTimeSelection} />
+                    <ScheduleTable
                     slotsByDay={slotsByDay}
                     practician={practician}
                     prestation={prestation}
@@ -227,7 +251,8 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
                 dateTimeSlot={dateTimeSlot}
                 setDateTimeSlot={setDateTimeSlot}
                     timeOfDay={timeOfDay}
-                /></div>
+                />
+                </div>
             ) : (
                 <p>Aucun créneau disponible pour cette semaine.</p>
             )}

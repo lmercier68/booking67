@@ -57,7 +57,7 @@ function OptionsComponent() {
             const responseData = await response.json();
             console.log('Succès:', responseData);
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('Erreur handlesubmit optonsComponent:', error);
         }
     };
 

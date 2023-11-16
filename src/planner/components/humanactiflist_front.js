@@ -8,7 +8,8 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 			.then(response => response.json())
 			.then(result => {
 				setData(result);
-			});
+			})
+			.catch((erreur) => { console.error(erreur); });
 	}, []);
 
 	const handleChange = (event) => {
