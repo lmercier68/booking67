@@ -13,8 +13,8 @@ const App = () => {
         slotDuration: 0,
         multipleAppointments: false,
         maxAppointments: 0,
-        multiplePracticians: false,
-        multiPrestations: false,
+        multiplePracticians: true,
+        multiPrestations: true,
         indicateNumberOfParticipants: false,
         allowObservations: false
     });
@@ -29,7 +29,7 @@ const App = () => {
             setOptions(transformFetchedOptions(data));
         });
 
-      !options.multiplePracticians?handlePractitionerChange(1):handlePractitionerChange(0);
+      !options.multiplePracticians?handlePractitionerChange(1):handlePractitionerChange(1);
         if(!options.multiPrestations){handlePrestationChange(1)};
         console.log('multipleractician2',options.multiplePracticians)
     }, [selectedPractitionerId]);
