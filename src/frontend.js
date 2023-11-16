@@ -29,9 +29,11 @@ const App = () => {
             setOptions(transformFetchedOptions(data));
         });
 
-        !options.multiplePracticians?handlePractitionerChange(1):handlePractitionerChange(0);
+      !options.multiplePracticians?handlePractitionerChange(1):handlePractitionerChange(0);
+        if(!options.multiPrestations){handlePrestationChange(1)};
         console.log('multipleractician2',options.multiplePracticians)
     }, [selectedPractitionerId]);
+
 
     const transformFetchedOptions = (fetchedOptions) => {
         let newOptions = {...options};
@@ -110,7 +112,7 @@ const handlePrestationChange = async (id) => {
                 <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange}/>}
             {options.multiPrestations &&
                 <PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>}
-            <WeekSelector onWeekChange={handleWeekChange}/>{}
+            <WeekSelector onWeekChange={handleWeekChange}/>
             {selectedPractitionerId &&
                  <AvailabilityDisplay options={options} practician={practician} prestation={prestation}
                                      selectedPractitionerId={selectedPractitionerId} selectedWeek={selectedWeek}/>

@@ -20,7 +20,7 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 	return (
 		<div>
 			<select id="humanRessourceSelect" onChange={handleChange}>
-				<option value="">Choisir un praticien</option>
+
 				{data.map(item => (
 					<option key={item.id} value={item.id}>
 						{item.nom} {item.prenom} - {item.role}

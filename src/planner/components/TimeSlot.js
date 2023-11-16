@@ -57,7 +57,9 @@ const modalClose=(e)=>{
 
                 {isModalOpen && (
                 <Modal_Appointment_Validation
+                    // ... passer les props nécessaires ...
                     onClose={modalClose}
+
                     slot={slot}
                     setNewAppointment={setNewAppointment}
                     practician={practician}

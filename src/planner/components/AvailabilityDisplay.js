@@ -239,7 +239,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
     return (
         <div>
             {availability.length > 0 ? (
-                <div> horaires
+                <div>
                       <AmpmSelector onSelectionChange={handleTimeSelection} />
                     <ScheduleTable
                     slotsByDay={slotsByDay}
