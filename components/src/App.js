@@ -5,11 +5,12 @@ import WeeklyPlanner from './components/weeklyPlanner';
 import HumanRessourcesform from "./components/humanRessourcesform";
 import GenericOptionsAdder from "./components/GenericOptionsAdder";
 import PrestationForm from "./components/PrestationForm";
+import OptionsComponent from "./components/OptionsComponent";
 
 function App({page}) {
     console.log('App executed, page:', page);
     if (page === 'main') {
-        return <HumanRessourcesform/>;
+        return <OptionsComponent/>;
     } else if (page === 'disponibilites') {
         return (<SelectionProvider>
             <WeeklyPlanner/>

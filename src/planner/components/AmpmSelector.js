@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 function AmpmSelector({ onSelectionChange }) {
-    const [selectedOption, setSelectedOption] = useState('');
+    const [selectedOption, setSelectedOption] = useState('AM');
 
     const handleOptionChange = (e) => {
         setSelectedOption(e.target.value);
+        console.log(e.target.value)
         onSelectionChange(e.target.value);
     };
 
@@ -16,6 +17,7 @@ function AmpmSelector({ onSelectionChange }) {
                     value="AM"
                     checked={selectedOption === 'AM'}
                     onChange={handleOptionChange}
+
                 />
                 Matin
             </label>

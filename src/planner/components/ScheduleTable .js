@@ -13,8 +13,14 @@ const getAllUniqueTimes = (slotsByDay) => {
 
     return Array.from(allTimes).sort(); // Trier les heures si nécessaire
 };
-const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot}) => {
+const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
+
+    const filteredTimes = allUniqueTimes.filter(time => {
+        const hour = parseInt(time.split(':')[0]);
+        return timeOfDay === 'AM' ? hour < 12 : hour >= 12;
+    });
+
     const headerStyle = {
         textAlign: 'center', // Centre le texte
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* Ombre */
@@ -25,8 +31,6 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
         width: '100%', // Utiliser toute la largeur disponible
         tableLayout: 'fixed', // Colonnes de largeur égale
     };
-
-    // Style pour les cellules et en-têtes
     const cellStyle = {
         width: `${100 / daysOfWeek.length}%`, // Répartir la largeur uniformément
         textAlign: 'center',
@@ -40,13 +44,13 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
             </tr>
             </thead>
              <tbody>
-           {allUniqueTimes.map((time, index) => (
-                <tr key={index}>
+             {filteredTimes.map((time, index) => (
+                 <tr key={index}>
                     {daysOfWeek.map(day => {
                         const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
                         return (
                             <td key={day} style={cellStyle}>
-                                <TimeSlot
+                                 <TimeSlot
                                           slot={slot}
                                           setNewAppointment={setNewAppointment}
                                           practician={practician}
@@ -55,6 +59,10 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                                           dateTimeSlot={dateTimeSlot}
                                           setDateTimeSlot={setDateTimeSlot}
                                 />
+
+
+
+
                             </td>
                         );
                     })}

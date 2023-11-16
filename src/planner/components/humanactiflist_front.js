@@ -8,7 +8,8 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 			.then(response => response.json())
 			.then(result => {
 				setData(result);
-			});
+			})
+			.catch((erreur) => { console.error(erreur); });
 	}, []);
 
 	const handleChange = (event) => {
@@ -19,7 +20,7 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 	return (
 		<div>
 			<select id="humanRessourceSelect" onChange={handleChange}>
-				<option value="">Choisir un praticien</option>
+
 				{data.map(item => (
 					<option key={item.id} value={item.id}>
 						{item.nom} {item.prenom} - {item.role}
