@@ -257,6 +257,8 @@ function create_rdv_table()
         rdv_dateTime datetime NOT NULL,
         rdv_status integer NOT NULL,
         customer_id integer ,
+        participants integer,
+        observation text,
         PRIMARY KEY  (id)
     ) $charset_collate;";
 

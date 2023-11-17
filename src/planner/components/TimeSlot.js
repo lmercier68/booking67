@@ -38,15 +38,15 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
         cursor: 'pointer',
         padding: '5px',
 
-        backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : 'red',
+        backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : '#f44336',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* Ombre */
         borderRadius: '10px', /* Bordures arrondies */
         border: '2px solid #ccc',
     };
-    console.log('selectedWeek: ',selectedWeek)
-    console.log('dateTimeSlot',dateTimeSlot)
-    console.log('practician',practician)
-    console.log('prestation',prestation)
+    //console.log('selectedWeek: ',selectedWeek)
+  //  console.log('dateTimeSlot',dateTimeSlot)
+   // console.log('practician',practician)
+   // console.log('prestation',prestation)
 const modalClose=(e)=>{
 
      setIsModalOpen(false)

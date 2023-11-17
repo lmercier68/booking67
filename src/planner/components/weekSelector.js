@@ -24,7 +24,7 @@ const WeekSelector = ({ onWeekChange }) => {
     };
 
     return (
-        <input type="date" value={selectedDate} onChange={handleDateChange} />
+        <input type="date" value={selectedDate} onChange={handleDateChange} min={currentDate} />
     );
 };
 
