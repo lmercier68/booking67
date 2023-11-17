@@ -254,10 +254,10 @@ console.log('daylsot',daySlots)
                     while (openTime < closeTime) {
                         let slotKey = `${openTime.getDate().toString().padStart(2, '0')}/${(openTime.getMonth() + 1).toString().padStart(2, '0')}/${openTime.getFullYear()} ${openTime.getHours().toString().padStart(2, '0')}:${openTime.getMinutes().toString().padStart(2, '0')}`;
                         let count = appointmentCounts.get(slotKey) || 0;
-                        console.log('appointmentCounts', appointmentCounts)
-                        console.log('slotKey', slotKey)
-                        console.log('max appointment', options.maxAppointments)
-console.log('count: ',count)
+                   //     console.log('appointmentCounts', appointmentCounts)
+                   //     console.log('slotKey', slotKey)
+                   //     console.log('max appointment', options.maxAppointments)
+//console.log('count: ',count)
                         // Vérifier si le créneau est disponible
 
                             if (options.maxAppointments === 0 || count < options.maxAppointments) {

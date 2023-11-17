@@ -5,8 +5,8 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
     const [isSelected, setIsSelected] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-
+console.log('slot', slot)
+    console.log('sdateTimeSlot', dateTimeSlot)
 
     if (!slot) {
         return null;
@@ -22,7 +22,11 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
 
 
     const handleClick = () => {
-        if (isAvailable && !isModalOpen) {
+        console.log('click',!isPastSlot(slot.date, time))
+        console.log('available', isAvailable)
+        console.log('slot date:' , slot.date)
+        if (isAvailable && !isModalOpen && slot.date && !isPastSlot(slot.date, time)) {
+            console.log('GO')
             setDateTimeSlot(slot);
             setIsModalOpen(true); // Ouvrir la modale
             setIsSelected(true);
@@ -34,28 +38,38 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
         setIsSelected(false);
     };
 
-    const slotStyle = {
-        cursor: 'pointer',
-        padding: '5px',
+    const isPastSlot = (slotDate, slotTime) => {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const slotDateTime = new Date(slotDate);
+        const [hours, minutes] = slotTime.split(':');
+        slotDateTime.setHours(hours, minutes, 0, 0);
 
+        return slotDateTime < today || (slotDateTime.toDateString() === today.toDateString() && slotDateTime < now);
+    };
+    const slotStyle = {
+
+        padding: '5px',
         backgroundColor: isAvailable ? (isSelected ? 'orange' : 'white') : '#f44336',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', /* Ombre */
-        borderRadius: '10px', /* Bordures arrondies */
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: '10px',
         border: '2px solid #ccc',
+        cursor: isAvailable && (!slot.date || !isPastSlot(slot.date, time)) ? 'pointer' : 'not-allowed',
+        opacity: slot.date && isPastSlot(slot.date, time) ? 0.5 : 1,
     };
     //console.log('selectedWeek: ',selectedWeek)
-  //  console.log('dateTimeSlot',dateTimeSlot)
-   // console.log('practician',practician)
-   // console.log('prestation',prestation)
-const modalClose=(e)=>{
+    //  console.log('dateTimeSlot',dateTimeSlot)
+    // console.log('practician',practician)
+    // console.log('prestation',prestation)
+    const modalClose=(e)=>{
 
-     setIsModalOpen(false)
-}
+        setIsModalOpen(false)
+    }
     return (
         <div onClick={handleClick} onBlur={handleBlur} tabIndex={0} style={slotStyle}>
             {formattedTime}
 
-                {isModalOpen && (
+            {isModalOpen && (
                 <Modal_Appointment_Validation
                     // ... passer les props nécessaires ...
                     onClose={modalClose}
