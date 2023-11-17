@@ -6,7 +6,8 @@ import SemainierController from "./planner/components/SemainierController";
 import AvailabilityDisplay from "./planner/components/AvailabilityDisplay";
 import WeekSelector from "./planner/components/weekSelector";
 import fetchOptions from "../components/src/components/scripts/fetchOptions";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
     const [options, setOptions] = useState({
         hasFixedTimeSlots: false,
@@ -108,6 +109,8 @@ const handlePrestationChange = async (id) => {
     console.log('multipleractician3',options.multiplePracticians)
     return (
         <div>
+            <ToastContainer />
+
             {options.multiplePracticians &&
                 <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange}/>}
             {options.multiPrestations &&
