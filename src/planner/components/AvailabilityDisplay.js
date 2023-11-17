@@ -131,7 +131,7 @@ console.log('rdv date: ', rdvDateTime)
 console.log('useeffect fetch appoitments')
         fetchBookedAppointments();
 
-    }, [selectedPractitionerId]);
+    }, [selectedPractitionerId,options.multipleAppointments]);
 
 
 
@@ -140,8 +140,8 @@ console.log('useeffect fetch appoitments')
        // console.log('fetch avail pratci: ', selectedPractitionerId)
 
         fetchAvailability();
-    }, [selectedPractitionerId, bookedAppointments, selectedWeek]);
-
+    }, [selectedPractitionerId, bookedAppointments, selectedWeek,options.multipleAppointments]);
+/*
     const calculateFreeSlots = (availability, appointments, weekDates) => {
         console.log('calculate free slots');
         let freeSlots = [];
@@ -215,6 +215,142 @@ console.log('daylsot',daySlots)
         });
 
         console.log("Free Slots:", freeSlots);
+        return freeSlots;
+    };*/
+    const calculateFreeSlots = (availability, appointments, weekDates) => {
+        console.log('calculate free slots');
+        let freeSlots = [];
+        let availabilityMap = new Map();
+
+        let appointmentCounts = new Map();
+
+        // Compter les rendez-vous pour chaque créneau horaire si multipleAppointments est activé
+        console.log('options : ', options)
+        if (options.multipleAppointments) {
+            console.log('multiappointment mode')
+            appointments.forEach(appointment => {
+                const [date, time] = appointment.rdv_dateTime.split(' ');
+                const [day, month, year] = date.split('/');
+                const [hours, minutes, seconds] = time.split(':');
+                let appointmentStart = new Date(year, month - 1, day, hours, minutes, seconds);
+
+                let slotKey = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year} ${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+
+                let currentCount = appointmentCounts.get(slotKey) || 0;
+                appointmentCounts.set(slotKey, currentCount + 1);
+            });
+            // Parcourir les disponibilités pour déterminer les créneaux libres
+            availability.forEach(avail => {
+                let dayName = avail.day_name.charAt(0).toUpperCase() + avail.day_name.slice(1);
+                let dayDate = weekDates.get(dayName);
+
+                if (dayDate) {
+                    let openTime = new Date(dayDate);
+                    openTime.setHours(avail.opening_time.split(':')[0], avail.opening_time.split(':')[1], 0);
+                    let closeTime = new Date(dayDate);
+                    closeTime.setHours(avail.closing_time.split(':')[0], avail.closing_time.split(':')[1], 0);
+
+                    let daySlots = [];
+                    while (openTime < closeTime) {
+                        let slotKey = `${openTime.getDate().toString().padStart(2, '0')}/${(openTime.getMonth() + 1).toString().padStart(2, '0')}/${openTime.getFullYear()} ${openTime.getHours().toString().padStart(2, '0')}:${openTime.getMinutes().toString().padStart(2, '0')}`;
+                        let count = appointmentCounts.get(slotKey) || 0;
+                        console.log('appointmentCounts', appointmentCounts)
+                        console.log('slotKey', slotKey)
+                        console.log('max appointment', options.maxAppointments)
+console.log('count: ',count)
+                        // Vérifier si le créneau est disponible
+
+                            if (options.maxAppointments === 0 || count < options.maxAppointments) {
+                                daySlots.push(new Date(openTime));
+                            }
+
+
+                        openTime.setMinutes(openTime.getMinutes() + parseInt(options.slotDuration));
+                    }
+
+                    if (daySlots.length > 0) {
+                        // Ajouter les créneaux libres pour ce jour
+                        freeSlots = freeSlots.concat(daySlots.map(slot => {
+                            return {
+                                day: dayName,
+                                date: slot.toLocaleDateString('fr-FR'),
+                                time: slot.toLocaleTimeString('fr-FR')
+                            };
+                        }));
+                    }
+                }
+            });
+        }else{
+            availability.forEach(avail => {
+                // Mettre la première lettre du jour en majuscule
+                let dayName = avail.day_name.charAt(0).toUpperCase() + avail.day_name.slice(1);
+
+                let dayDate = weekDates.get(dayName);
+                if (dayDate) {
+                    let openTime = new Date(dayDate);
+                    openTime.setHours(avail.opening_time.split(':')[0], avail.opening_time.split(':')[1], 0);
+                    let closeTime = new Date(dayDate);
+                    closeTime.setHours(avail.closing_time.split(':')[0], avail.closing_time.split(':')[1], 0);
+
+                    let daySlots = [];
+                    while (openTime < closeTime) {
+                        daySlots.push(new Date(openTime));
+                        openTime.setMinutes(openTime.getMinutes() + parseInt(options.slotDuration)); // Supposons des créneaux de 30 minutes
+                    }
+
+                    // Utiliser dayName comme clé dans availabilityMap
+                    availabilityMap.set(dayName, daySlots);
+                    console.log("Availability Map:", availabilityMap);
+                }
+            });
+
+            // Filtrer les créneaux occupés par les rendez-vous
+            appointments.forEach(appointment => {
+                console.log("Processing appointment:", appointment);
+                //let appointmentStart = new Date(appointment.rdv_dateTime);
+                const [date, time] = appointment.rdv_dateTime.split(' ');
+                const [day, month, year] = date.split('/');
+                const [hours, minutes, seconds] = time.split(':');
+                let appointmentStart = new Date(year, month - 1, day, hours, minutes, seconds);
+
+
+                // Durée du rendez-vous, supposée être en heures.
+                let durationHours = parseInt(appointment.prestation_duration.split(':')[0]);
+                let durationMinutes = parseInt(appointment.prestation_duration.split(':')[1] || '0'); // S'il y a des minutes dans la durée.
+
+                let appointmentEnd = new Date(appointmentStart);
+                appointmentEnd.setHours(appointmentEnd.getHours() + durationHours);
+                appointmentEnd.setMinutes(appointmentEnd.getMinutes() + durationMinutes);
+
+                let dayName = appointmentStart.toLocaleDateString('fr-FR', { weekday: 'long' });
+                dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+
+                let daySlots = availabilityMap.get(dayName);
+                console.log('appointmentEnd: ',appointmentEnd);
+                console.log('appointmentStart: ',appointmentStart);
+                console.log('daylsot',daySlots)
+                if (daySlots) {
+
+                    availabilityMap.set(dayName, daySlots.filter(slot =>
+                        slot < appointmentStart || slot >= appointmentEnd
+                    ));
+                }
+                console.log("Availability Map after processing appointment:", availabilityMap);
+
+            });
+            console.log("Final Availability Map before conversion:", availabilityMap);
+            // Convertir la carte en liste de créneaux libres
+            availabilityMap.forEach((slots, day) => {
+                slots.forEach(slot => {
+                    let slotDate = slot.toLocaleDateString('fr-FR');
+                    freeSlots.push({ day: day, date: slotDate, time: slot.toLocaleTimeString('fr-FR') });
+                });
+            });
+
+        }
+
+
+
         return freeSlots;
     };
     const getWeekDates = (startDate) => {

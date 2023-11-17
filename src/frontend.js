@@ -32,7 +32,7 @@ const App = () => {
 
       !options.multiplePracticians?handlePractitionerChange(1):handlePractitionerChange(1);
         if(!options.multiPrestations){handlePrestationChange(1)};
-        console.log('multipleractician2',options.multiplePracticians)
+
     }, [selectedPractitionerId]);
 
 
@@ -66,10 +66,8 @@ const App = () => {
         endDate: getSundayOfCurrentWeek(),
     });
     const handlePractitionerChange = async (id) => {
-        console.log('handlepractionner change', id)
 
         const url = `/wp-json/booker67/v1/human-ressource/${id}`;
-
 
         try {
             const response = await fetch(url);
@@ -79,7 +77,6 @@ const App = () => {
             const data = await response.json();
             setPractician(data);
             setSelectedPractitionerId(id);
-            console.log('handlePractionnerChange data : ' , data)
         } catch (error) {
             console.error('Erreur lors de la récupération des données:', error);
             // Ici, vous pouvez gérer l'erreur, par exemple en affichant un message à l'utilisateur
@@ -99,14 +96,12 @@ const handlePrestationChange = async (id) => {
         }
         const data = await response.json();
         setPrestation(data);
-        console.log('prestation change choisi: ', data); // Notez l'utilisation de `data` ici au lieu de `prestation`
-        console.log('handlePrestationChange data : ' , data)
     } catch (error) {
         console.error('Erreur lors de la récupération de la prestation:', error);
         // Gérer l'erreur, par exemple en affichant un message d'erreur à l'utilisateur
     }
 };
-    console.log('multipleractician3',options.multiplePracticians)
+
     return (
         <div>
             <ToastContainer />
