@@ -46,12 +46,21 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
              <tbody>
              {filteredTimes.map((time, index) => (
                  <tr key={index}>
-                    {daysOfWeek.map(day => {
-                        const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
-                        return (
-                            <td key={day} style={cellStyle}>
+                     {daysOfWeek.map((day, dayIndex) => {
+                         const slot = slotsByDay[day]?.find(s => s.time === time) || { time, isAvailable: false };
+
+                         // Calculer la date pour chaque jour de la semaine, en commençant par lundi
+                         const slotDate = new Date(selectedWeek.startDate);
+                         // Ajouter dayIndex jours à la date de début (qui est un lundi)
+                         slotDate.setDate(slotDate.getDate() + dayIndex);
+
+                         // Ajouter la propriété date au slot
+                         const slotWithDate = { ...slot, date: slotDate.toISOString().split('T')[0] };
+
+                         return (
+                             <td key={day} style={cellStyle}>
                                  <TimeSlot
-                                          slot={slot}
+                                     slot={slotWithDate}
                                           setNewAppointment={setNewAppointment}
                                           practician={practician}
                                           prestation={prestation}

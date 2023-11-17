@@ -1,9 +1,9 @@
 const Modal_Appointment_Validation = ({dateTimeSlot,
                                           practician,
                                           prestation,
-                                          selectedWeek,
+
                                           setNewAppointment,
-                                          slot,
+
                                           onClose
                                           }) => {
     console.log(dateTimeSlot)
