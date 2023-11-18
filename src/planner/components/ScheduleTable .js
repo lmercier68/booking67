@@ -59,7 +59,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                          const slotWithDate = { ...slot, date: slotDate.toISOString().split('T')[0] };
 
                          return (
-                             <td key={day} style={cellStyle}>toto
+                             <td key={day} style={cellStyle}>
                                  <TimeSlot
                                      slot={slotWithDate}
                                           setNewAppointment={setNewAppointment}

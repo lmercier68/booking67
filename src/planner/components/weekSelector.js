@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import './css/weekSelector.css'
 
-const WeekSelector = ({ onWeekChange }) => {
+const WeekSelector = ({onWeekChange}) => {
     // Obtenir la date actuelle et la formater en YYYY-MM-DD
     const currentDate = new Date().toISOString().split('T')[0];
 
@@ -20,11 +21,15 @@ const WeekSelector = ({ onWeekChange }) => {
         const endDate = new Date(startDate);
         endDate.setDate(endDate.getDate() + 6);
 
-        return { startDate, endDate };
+        return {startDate, endDate};
     };
 
     return (
-        <input type="date" value={selectedDate} onChange={handleDateChange} min={currentDate} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
+            <label htmlFor="weekSelectorInput" style={{ fontWeight:"bold", display: 'block', marginBottom: '5px' }}>Semaine du </label>
+            <input type="date" id='weekSelectorInput' className='weekSelector' value={selectedDate}
+                   onChange={handleDateChange} min={currentDate}/>
+        </div>
     );
 };
 

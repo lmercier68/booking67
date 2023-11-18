@@ -1,8 +1,7 @@
-import React, { useState, useEffect,useContext } from '@wordpress/element';
+import React, {useState, useEffect, useContext} from '@wordpress/element';
 
 
-
-function PrestationSelect({practitionerId,onPrestationChange}) {
+function PrestationSelect({practitionerId, onPrestationChange}) {
     const [prestations, setPrestations] = useState([]);
 
     const handleChange = (event) => {
@@ -13,7 +12,7 @@ function PrestationSelect({practitionerId,onPrestationChange}) {
     useEffect(() => {
         const fetchPrestations = async () => {
             // Construire l'URL en fonction de l'existence de practitionerId
-            if(practitionerId !== 0 && practitionerId !== undefined) {
+            if (practitionerId !== 0 && practitionerId !== undefined) {
                 let url = '/wp-json/booker67/v1/prestations';
                 if (practitionerId) {
                     url += `/practitioner_id/${practitionerId}`;
@@ -34,16 +33,20 @@ function PrestationSelect({practitionerId,onPrestationChange}) {
         fetchPrestations();
     }, [practitionerId]);
 
-    console.log('prestations for practician: ' ,prestations)
-    return (
-        <select onChange={handleChange}>
-            <option value="">Sélectionnez une prestation</option>
-            { prestations.map(prestation => (
-                <option key={prestation.id} value={prestation.id}>
-                    {prestation.prestation_name} - {prestation.prestation_cost} - {prestation.prestation_duration}
-                </option>
-            ))}
-        </select>
+    console.log('prestations for practician: ', prestations)
+    return (<div>
+            <label htmlFor="prestationSelector" style={{fontWeight:"bold", display: 'block', marginBottom: '5px'}}>
+                Choix de la prestation :
+            </label>
+            <select id='prestationSelector' onChange={handleChange}>
+                <option value="">Sélectionnez une prestation</option>
+                {prestations.map(prestation => (
+                    <option key={prestation.id} value={prestation.id}>
+                        {prestation.prestation_name} - {prestation.prestation_cost} - {prestation.prestation_duration}
+                    </option>
+                ))}
+            </select>
+        </div>
     );
 }
 

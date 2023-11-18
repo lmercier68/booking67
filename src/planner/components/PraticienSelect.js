@@ -19,7 +19,8 @@ function PraticienSelect() {
     }, []);
 
     return (
-        <select>
+        <div><label htmlFor="practicianSelector">Choix de l'intervenant :</label>
+        <select id='practicianSelector'>
             <option value="">Sélectionnez un praticien</option>
             {!loading && praticiens.map(praticien => (
                 <option key={praticien.id} value={praticien.id}>
@@ -27,6 +28,7 @@ function PraticienSelect() {
                 </option>
             ))}
         </select>
+            </div>
     );
 }
 
