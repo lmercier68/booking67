@@ -5,6 +5,7 @@ function ParticipantsNumberSelector({onNumberChange}) {
 
     const handleChange = (event) => {
         onNumberChange(event.target.value);
+        setSelectedNumber(event.target.value)
     };
 
     return (
