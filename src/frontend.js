@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import PrestationSelect from "./planner/components/PrestationSelect";
 import HumanRessourcesActifSelect from "./planner/components/humanactiflist_front";
-import SemainierController from "./planner/components/SemainierController";
+
 import AvailabilityDisplay from "./planner/components/AvailabilityDisplay";
 import WeekSelector from "./planner/components/weekSelector";
 import fetchOptions from "../components/src/components/scripts/fetchOptions";
