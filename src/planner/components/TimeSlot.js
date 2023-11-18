@@ -5,8 +5,8 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
     const [isSelected, setIsSelected] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-console.log('slot', slot)
-    console.log('sdateTimeSlot', dateTimeSlot)
+//console.log('slot', slot)
+    //console.log('sdateTimeSlot', dateTimeSlot)
 
     if (!slot) {
         return null;
@@ -22,11 +22,7 @@ console.log('slot', slot)
 
 
     const handleClick = () => {
-        console.log('click',!isPastSlot(slot.date, time))
-        console.log('available', isAvailable)
-        console.log('slot date:' , slot.date)
         if (isAvailable && !isModalOpen && slot.date && !isPastSlot(slot.date, time)) {
-            console.log('GO')
             setDateTimeSlot(slot);
             setIsModalOpen(true); // Ouvrir la modale
             setIsSelected(true);

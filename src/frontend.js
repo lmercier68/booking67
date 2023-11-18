@@ -8,21 +8,24 @@ import WeekSelector from "./planner/components/weekSelector";
 import fetchOptions from "../components/src/components/scripts/fetchOptions";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ParticipantsNumberSelector from "./planner/components/ParticpantsNumberSelector";
 const App = () => {
     const [options, setOptions] = useState({
         hasFixedTimeSlots: false,
-        slotDuration: 0,
+        slotDuration: 30,
         multipleAppointments: false,
         maxAppointments: 0,
         multiplePracticians: true,
         multiPrestations: true,
         indicateNumberOfParticipants: false,
-        allowObservations: false
+        allowObservations: false,
+        participants:1
     });
     const [selectedPractitionerId, setSelectedPractitionerId] = useState(0);
     const [selectedPrestationId, setSelectedPrestationId] = useState(0);
     const [practician, setPractician] = useState(null)
     const [prestation, setPrestation] = useState(null)
+    const [participants, setParticipants] = useState(1)
 
     useEffect(() => {
         fetchOptions(['genType_hasFixedTimeSlots', 'genType_multipleAppointments', 'genType_slotDuration', 'genType_maxAppointments', 'genType_multiplePracticians', 'genType_multiPrestations', 'genType_indicateNumberOfParticipants', 'genType_allowObservations']).then(data => {
@@ -35,7 +38,28 @@ const App = () => {
 
     }, [selectedPractitionerId]);
 
+/*
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await fetchOptions(['genType_hasFixedTimeSlots', 'genType_multipleAppointments', 'genType_slotDuration', 'genType_maxAppointments', 'genType_multiplePracticians', 'genType_multiPrestations', 'genType_indicateNumberOfParticipants', 'genType_allowObservations']);
+                const transformedOptions = transformFetchedOptions(data);
+                setOptions(transformedOptions);
 
+                // Actions à exécuter après la réussite de la requête
+                if(!transformedOptions.multiplePracticians){
+                    handlePractitionerChange(1);
+                }
+                if(!transformedOptions.multiPrestations){
+                    handlePrestationChange(1);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des options:', error);
+            }
+        };
+
+        fetchData();
+    }, [selectedPractitionerId]); // Dépendances du useEffect*/
     const transformFetchedOptions = (fetchedOptions) => {
         let newOptions = {...options};
         fetchedOptions.forEach(opt => {
@@ -76,14 +100,17 @@ const App = () => {
             }
             const data = await response.json();
             setPractician(data);
-            setSelectedPractitionerId(id);
+            if(selectedPractitionerId !== id){
+            setSelectedPractitionerId(id);}
         } catch (error) {
             console.error('Erreur lors de la récupération des données:', error);
             // Ici, vous pouvez gérer l'erreur, par exemple en affichant un message à l'utilisateur
         }
     };
 
-
+const handleParticipantsChange = (nb)=>{
+    setParticipants(nb)
+}
 const handlePrestationChange = async (id) => {
     console.log('handleprestation change');
     setSelectedPrestationId(id);
@@ -111,9 +138,10 @@ const handlePrestationChange = async (id) => {
             {options.multiPrestations &&
                 <PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>}
             <WeekSelector onWeekChange={handleWeekChange}/>
+            {options.indicateNumberOfParticipants && <ParticipantsNumberSelector onNumberChange={handleParticipantsChange}/>}
             {selectedPractitionerId &&
                  <AvailabilityDisplay options={options} practician={practician} prestation={prestation}
-                                     selectedPractitionerId={selectedPractitionerId} selectedWeek={selectedWeek}/>
+                                     selectedPractitionerId={selectedPractitionerId} selectedWeek={selectedWeek} participants={participants}/>
 
             }
 
