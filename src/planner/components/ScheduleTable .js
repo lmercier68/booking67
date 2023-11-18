@@ -36,6 +36,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
         textAlign: 'center',
         fontWeight: 'bold'
     };
+    console.log('filteredTimes: ',filteredTimes)
     return (
         <table style={tableStyle}>
             <thead style={headerStyle}>
@@ -58,7 +59,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                          const slotWithDate = { ...slot, date: slotDate.toISOString().split('T')[0] };
 
                          return (
-                             <td key={day} style={cellStyle}>
+                             <td key={day} style={cellStyle}>toto
                                  <TimeSlot
                                      slot={slotWithDate}
                                           setNewAppointment={setNewAppointment}
