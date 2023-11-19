@@ -1062,6 +1062,7 @@ function api_add_rdv($request) {
     $rdv_status = $params['rdv_status'];
     $customer_id = $params['customer_id'];
     $participants = $params['participants'];
+    $observation = $params['observation'];
     // Nom de la table
     $table_name = $wpdb->prefix . 'booker67_rdv';
 
@@ -1075,9 +1076,10 @@ function api_add_rdv($request) {
             'rdv_dateTime' => $rdv_dateTime,
             'rdv_status' => $rdv_status,
             'customer_id' => $customer_id,
-            'participants' => $participants
+            'participants' => $participants,
+            'observation'=> $observation
         ),
-        array('%d', '%d', '%s', '%s', '%d', '%d')
+        array('%d', '%d', '%s', '%s', '%d', '%d','%d','%s')
     );
 
     // Vérification du résultat de l'insertion
