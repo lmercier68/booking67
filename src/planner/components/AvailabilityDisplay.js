@@ -10,11 +10,17 @@ function createDateTime(date, time) {
     const dateTimeString = `${year}-${month}-${day}T${time}`;
     return new Date(dateTimeString);
 }
-
+function formatDate(date) {
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois sont indexés à partir de 0
+    let year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 const AvailabilityDisplay = ({options,practician,prestation, selectedPractitionerId , selectedWeek,participants }) => {
 
 
     const [availability, setAvailability] = useState(["e",'r']);
+    const [isLoading, setIsLoading] = useState(false);
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
     const [observation, setObservation] = useState('essai');
@@ -158,17 +164,18 @@ console.log('useeffect fetch appoitments')
 
     const calculateFreeSlots = (availability, appointments, weekDates) => {
         console.log('calculate free slots');
+        setIsLoading(true);
         let freeSlots = [];
         let availabilityMap = new Map();
 
         let appointmentCounts = new Map();
 
         // Compter les rendez-vous pour chaque créneau horaire si multipleAppointments est activé
-        console.log('options : ', options)
+
         if (options.multipleAppointments) {
             console.log('multiappointment mode')
-            console.log('appointments' , appointments)
-            console.log('availlability', availability)
+            //console.log('appointments' , appointments)
+            //console.log('availlability', availability)
             appointments.forEach(appointment => {
                 const [date, time] = appointment.rdv_dateTime.split(' ');
                 const [day, month, year] = date.split('/');
@@ -247,13 +254,13 @@ console.log('useeffect fetch appoitments')
 
                     // Utiliser dayName comme clé dans availabilityMap
                     availabilityMap.set(dayName, daySlots);
-                    console.log("Availability Map:", availabilityMap);
+                    //console.log("Availability Map:", availabilityMap);
                 }
             });
 
             // Filtrer les créneaux occupés par les rendez-vous
             appointments.forEach(appointment => {
-                console.log("Processing appointment:", appointment);
+                //console.log("Processing appointment:", appointment);
                 //let appointmentStart = new Date(appointment.rdv_dateTime);
                 const [date, time] = appointment.rdv_dateTime.split(' ');
                 const [day, month, year] = date.split('/');
@@ -273,19 +280,19 @@ console.log('useeffect fetch appoitments')
                 dayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
 
                 let daySlots = availabilityMap.get(dayName);
-                console.log('appointmentEnd: ',appointmentEnd);
-                console.log('appointmentStart: ',appointmentStart);
-                console.log('daylsot',daySlots)
+                //console.log('appointmentEnd: ',appointmentEnd);
+                //console.log('appointmentStart: ',appointmentStart);
+                //console.log('daylsot',daySlots)
                 if (daySlots) {
 
                     availabilityMap.set(dayName, daySlots.filter(slot =>
                         slot < appointmentStart || slot >= appointmentEnd
                     ));
                 }
-                console.log("Availability Map after processing appointment:", availabilityMap);
+                //console.log("Availability Map after processing appointment:", availabilityMap);
 
             });
-            console.log("Final Availability Map before conversion:", availabilityMap);
+            //console.log("Final Availability Map before conversion:", availabilityMap);
             // Convertir la carte en liste de créneaux libres
             availabilityMap.forEach((slots, day) => {
                 slots.forEach(slot => {
@@ -295,9 +302,9 @@ console.log('useeffect fetch appoitments')
             });
 
         }
-console.log(freeSlots)
+//console.log(freeSlots)
 
-
+        setIsLoading(false);
         return freeSlots;
     };
     const getWeekDates = (startDate) => {
@@ -346,8 +353,10 @@ console.log(freeSlots)
 
 
     return (
-        <div>
-            {availability.length > 0 ? (
+        <div>{isLoading ? (
+            <div className="loader">Chargement...</div> // Affiche le loader
+        ) : (
+            availability.length > 0 ? (
                 <div>
                       <AmpmSelector onSelectionChange={handleTimeSelection} />
                     <ScheduleTable
@@ -366,6 +375,7 @@ console.log(freeSlots)
                 </div>
             ) : (
                 <p>Aucun créneau disponible pour cette semaine.</p>
+                )
             )}
         </div>
     );
