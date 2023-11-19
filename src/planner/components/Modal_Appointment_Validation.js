@@ -1,11 +1,13 @@
-const Modal_Appointment_Validation = ({dateTimeSlot,
+import AppointmentObservation from "./AppointmentObservation";
+const Modal_Appointment_Validation = ({
+                                          dateTimeSlot,
                                           practician,
                                           prestation,
-
                                           setNewAppointment,
-
+                                          canWriteobservation,
+                                          setObservation,
                                           onClose
-                                          }) => {
+                                      }) => {
     console.log(dateTimeSlot)
     const buttonStyleValid = {
         backgroundColor: '#4CAF50', // Couleur de fond verte
@@ -71,6 +73,11 @@ const Modal_Appointment_Validation = ({dateTimeSlot,
                     <hr/>
                        <b>date du rendez-vous :</b>  le {dateTimeSlot.day} {dateTimeSlot.date} à <b>{dateTimeSlot.time}</b>
                    </p>
+                    {canWriteobservation&&
+                    <p>
+                        <AppointmentObservation setObservation={setObservation}/>
+                    </p>
+                    }
                     <div style={{
                         display: 'flex',
                         justifyContent: 'center', // Centre horizontalement

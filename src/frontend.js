@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import PrestationSelect from "./planner/components/PrestationSelect";
 import HumanRessourcesActifSelect from "./planner/components/humanactiflist_front";
-import SemainierController from "./planner/components/SemainierController";
+
 import AvailabilityDisplay from "./planner/components/AvailabilityDisplay";
 import WeekSelector from "./planner/components/weekSelector";
 import fetchOptions from "../components/src/components/scripts/fetchOptions";
@@ -128,7 +128,7 @@ const handlePrestationChange = async (id) => {
         // Gérer l'erreur, par exemple en affichant un message d'erreur à l'utilisateur
     }
 };
-
+/*
     return (
         <div>
             <ToastContainer />
@@ -147,9 +147,42 @@ const handlePrestationChange = async (id) => {
 
 
         </div>
-    );
-}
+ */
+    return (
+        <div>
+            <ToastContainer />
 
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '20px' }}>
+                {options.multiplePracticians &&
+                    <div style={{ flexBasis: '48%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <HumanRessourcesActifSelect onPractitionerChange={handlePractitionerChange}/>
+                    </div>
+                }
+                {options.multiPrestations &&
+                    <div style={{ flexBasis: '48%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <PrestationSelect practitionerId={selectedPractitionerId} onPrestationChange={handlePrestationChange}/>
+                    </div>
+                }
+                {options.indicateNumberOfParticipants &&
+                    <div style={{ flexBasis: '48%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <ParticipantsNumberSelector onNumberChange={handleParticipantsChange}/>
+                    </div>
+                }
+                <div style={{ flexBasis: options.indicateNumberOfParticipants ? '48%' : '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <WeekSelector onWeekChange={handleWeekChange}/>
+                </div>
+            </div>
+
+            {selectedPractitionerId &&
+                <div style={{ width: '100%' }}>
+                    <AvailabilityDisplay options={options} practician={practician} prestation={prestation}
+                                         selectedPractitionerId={selectedPractitionerId} selectedWeek={selectedWeek} participants={participants}/>
+                </div>
+            }
+        </div>
+
+);
+}
 document.addEventListener('DOMContentLoaded', () => {
     const rootElement = document.getElementById('booking67-root');
     if (rootElement) {

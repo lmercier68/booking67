@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal_Appointment_Validation from "./Modal_Appointment_Validation";
 
-function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment,dateTimeSlot,setDateTimeSlot}) {
+function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment,dateTimeSlot,setDateTimeSlot,canWriteobservation,  setObservation}) {
     const [isSelected, setIsSelected] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,6 +76,8 @@ function TimeSlot({ practician, prestation, selectedWeek,slot ,setNewAppointment
                     prestation={prestation}
                     selectedWeek={selectedWeek}
                     dateTimeSlot={dateTimeSlot}
+                    canWriteobservation={canWriteobservation}
+                    setObservation={setObservation}
                 />
             )}
         </div>

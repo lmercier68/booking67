@@ -13,7 +13,7 @@ const getAllUniqueTimes = (slotsByDay) => {
 
     return Array.from(allTimes).sort(); // Trier les heures si nécessaire
 };
-const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay}) => {
+const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay,canWriteobservation, setObservation}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
 
     const filteredTimes = allUniqueTimes.filter(time => {
@@ -59,7 +59,7 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                          const slotWithDate = { ...slot, date: slotDate.toISOString().split('T')[0] };
 
                          return (
-                             <td key={day} style={cellStyle}>toto
+                             <td key={day} style={cellStyle}>
                                  <TimeSlot
                                      slot={slotWithDate}
                                           setNewAppointment={setNewAppointment}
@@ -68,6 +68,8 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                                           selectedWeek={selectedWeek}
                                           dateTimeSlot={dateTimeSlot}
                                           setDateTimeSlot={setDateTimeSlot}
+                                     canWriteobservation={canWriteobservation}
+                                     setObservation={setObservation}
                                 />
 
 

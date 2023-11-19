@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import React from "@wordpress/element";
 
 function HumanRessourcesActifSelect({ onPractitionerChange }) {
 	const [data, setData] = useState([]);
@@ -18,7 +19,10 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 	};
 
 	return (
-		<div>
+		<div style={{ fontWeight:"bold", display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
+			<label htmlFor="humanRessourceSelect" style={{ display: 'block', marginBottom: '5px' }}>
+				Choix de l'intervenant :
+			</label>
 			<select id="humanRessourceSelect" onChange={handleChange}>
 
 				{data.map(item => (

@@ -9,7 +9,10 @@ function ParticipantsNumberSelector({onNumberChange}) {
     };
 
     return (
-        <div><label htmlFor="number-of-participants">Nombre de participants :</label>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
+            <label htmlFor="number-of-participants" style={{ fontWeight:"bold",display: 'block', marginBottom: '5px' }}>
+                Participants :
+            </label>
         <select id="number-of-participants" value={selectedNumber} onChange={handleChange}>
             {Array.from({ length: 50 }, (_, i) => (
                 <option key={i + 1} value={i + 1}>

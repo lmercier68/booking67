@@ -7,11 +7,7 @@ import './css/availability.css'
 function createDateTime(date, time) {
     const [year, month, day] = date.split('-');
     console.log([year,month,day])
-  //  const formattedDate = `${day}/${month}/${year}`;
-   // console.log('formated date',formattedDate)
     const dateTimeString = `${year}-${month}-${day}T${time}`;
-    console.log('dateTimeString',dateTimeString)
-    console.log('new date',new Date(dateTimeString))
     return new Date(dateTimeString);
 }
 
@@ -21,9 +17,10 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
     const [availability, setAvailability] = useState(["e",'r']);
     const [bookedAppointments, setBookedAppointments] = useState([]);
     const [newAppointment, setNewAppointment] = useState(false);
+    const [observation, setObservation] = useState('essai');
     const [dateTimeSlot, setDateTimeSlot] = useState(null);
     const [timeOfDay, setTimeOfDay] = useState('AM');
-    const [refresher,setRefresher] = useState(false)
+
     const estMonte = useRef(false);
     useEffect(() => {
         estMonte.current = true;
@@ -35,10 +32,11 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
         setTimeOfDay(selectedTime);
         // Vous pouvez également effectuer d'autres actions ici si nécessaire
     };
-    const addNewRdv = async (practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId) => {
+    const addNewRdv = async (practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId,participants,observation) => {
         // L'URL de l'API (remplacer 'votre-site.com' par l'URL réelle de votre site WordPress)
+
         const apiUrl = '/wp-json/booker67/v1/add-rdv/';
-console.log('rdv date: ', rdvDateTime)
+        console.log('observation' , observation)
         // Création du corps de la requête
         const data = {
             practician_id: practicianId,
@@ -47,7 +45,8 @@ console.log('rdv date: ', rdvDateTime)
             rdv_dateTime: rdvDateTime,
             rdv_status: 1,
             customer_id: customerId,
-            participants:parseInt(participants)
+            participants:parseInt(participants),
+            observation:observation
         };
 
         // Envoi de la requête POST
@@ -79,7 +78,7 @@ console.log('rdv date: ', rdvDateTime)
         if(newAppointment){
             console.log('dateTimeSlot',dateTimeSlot)
             console.log('create date ' ,createDateTime(dateTimeSlot.date,dateTimeSlot.time))
-            addNewRdv(practician.id,prestation.id,prestation.prestation_duration,createDateTime(dateTimeSlot.date,dateTimeSlot.time),1,null,participants)
+            addNewRdv(practician.id,prestation.id,prestation.prestation_duration,createDateTime(dateTimeSlot.date,dateTimeSlot.time),1,null,participants,observation)
         }
     }, [newAppointment]);
     const fetchBookedAppointments = async () => {
@@ -361,6 +360,8 @@ console.log(freeSlots)
                 dateTimeSlot={dateTimeSlot}
                 setDateTimeSlot={setDateTimeSlot}
                     timeOfDay={timeOfDay}
+                    canWriteobservation={options.allowObservations}
+                    setObservation={setObservation}
                 />
                 </div>
             ) : (
