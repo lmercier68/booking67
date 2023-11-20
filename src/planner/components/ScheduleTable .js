@@ -18,7 +18,7 @@ const getAllUniqueTimes = (slotsByDay) => {
 
     return Array.from(allTimes).sort(); // Trier les heures si nécessaire
 };
-const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay,canWriteobservation, setObservation}) => {
+const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay,canWriteobservation, setObservation,userData,setUserData}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
 
     const filteredTimes = allUniqueTimes.filter(time => {
@@ -41,7 +41,6 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
         textAlign: 'center',
         fontWeight: 'bold'
     };
-    console.log('filteredTimes: ',filteredTimes)
     return (
         <table style={tableStyle}>
             <thead style={headerStyle}>
@@ -91,6 +90,8 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                                           setDateTimeSlot={setDateTimeSlot}
                                      canWriteobservation={canWriteobservation}
                                      setObservation={setObservation}
+                                     setUserData={setUserData}
+                                     userData={userData}
                                 />
 
 
