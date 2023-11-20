@@ -1,7 +1,12 @@
 import React from 'react';
 import TimeSlot from './TimeSlot';
 
-
+function formatDate(date) {
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Les mois sont indexés à partir de 0
+    let year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 const getAllUniqueTimes = (slotsByDay) => {
     const allTimes = new Set();
 
@@ -13,7 +18,7 @@ const getAllUniqueTimes = (slotsByDay) => {
 
     return Array.from(allTimes).sort(); // Trier les heures si nécessaire
 };
-const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay,canWriteobservation, setObservation}) => {
+const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOfWeek ,setNewAppointment,dateTimeSlot,setDateTimeSlot, timeOfDay,canWriteobservation, setObservation,userData,setUserData}) => {
     const allUniqueTimes = getAllUniqueTimes(slotsByDay);
 
     const filteredTimes = allUniqueTimes.filter(time => {
@@ -36,15 +41,30 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
         textAlign: 'center',
         fontWeight: 'bold'
     };
-    console.log('filteredTimes: ',filteredTimes)
     return (
         <table style={tableStyle}>
             <thead style={headerStyle}>
             <tr>
-                {daysOfWeek.map(day => <th key={day}>{day}</th>)}
+                {daysOfWeek.map((day, index) => {
+                    // Calculer la date pour chaque jour
+                    const date = new Date(selectedWeek.startDate);
+                    date.setDate(date.getDate() + index);
+
+                    // Utiliser la fonction formatDate pour obtenir la date formatée
+                    const dateString = formatDate(date);
+
+                    return (
+                        <th key={day} style={{ ...cellStyle, fontWeight: 'bolder' }}>
+                            {day}
+                            <br />
+                            <span style={{ fontSize: 'smaller', fontWeight: 'normal'  }}>{dateString}</span>
+                        </th>
+                    );
+                })}
             </tr>
             </thead>
-             <tbody>
+
+            <tbody>
              {filteredTimes.map((time, index) => (
                  <tr key={index}>
                      {daysOfWeek.map((day, dayIndex) => {
@@ -70,6 +90,8 @@ const ScheduleTable = ({ practician, prestation, selectedWeek,slotsByDay, daysOf
                                           setDateTimeSlot={setDateTimeSlot}
                                      canWriteobservation={canWriteobservation}
                                      setObservation={setObservation}
+                                     setUserData={setUserData}
+                                     userData={userData}
                                 />
 
 

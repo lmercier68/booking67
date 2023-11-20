@@ -25,6 +25,7 @@
 		"bootstrap": "^5.3.2",
 		"create-block": "^1.0.2",
 		"moment": "^2.29.4",
+		"nodemailer": "^6.9.7",
 		"react-beautiful-dnd": "^13.1.1",
 		"react-bootstrap": "^2.9.1",
 		"react-toastify": "^9.1.3"

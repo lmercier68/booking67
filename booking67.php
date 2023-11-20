@@ -142,6 +142,9 @@ function booker67_enqueue_public_scripts()
         filemtime(plugin_dir_path(__FILE__) . 'build/frontend.js'),
         true
     );
+    wp_localize_script('mon-plugin-frontend', 'wpApiSettings', array(
+        'nonce' => wp_create_nonce('wp_rest')
+    ));
 
 }
 
@@ -256,16 +259,21 @@ function create_rdv_table()
         prestation_duration time NOT NULL,
         rdv_dateTime datetime NOT NULL,
         rdv_status integer NOT NULL,
-        customer_id integer ,
         participants integer,
         observation text,
+        user_mail varchar(255) DEFAULT NULL,
+        user_id integer DEFAULT NULL,
+        user_name varchar(255) DEFAULT NULL,
+        user_firstName varchar(255) DEFAULT NULL,
+        user_lastName varchar(255) DEFAULT NULL,
+        user_phone varchar(20) DEFAULT NULL,
         PRIMARY KEY  (id)
     ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 
-    insert_random_data_for_testing();
+    //insert_random_data_for_testing();
 
 }
 
@@ -544,6 +552,19 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'api_add_rdv',
     ));
+    register_rest_route('booking67/v1', '/send-mail', array(
+        'methods' => 'POST',
+        'callback' => 'booking67_send_mail',
+        'permission_callback' =>  '__return_true'
+
+        ));
+    register_rest_route('booking67/v1', '/current-user', array(
+        'methods' => 'GET',
+        'callback' => 'api_get_current_user_info',
+        'permission_callback' => function () {
+            return is_user_logged_in();
+        }
+    ));
 //endregion
 });
 
@@ -798,6 +819,12 @@ function add_options(WP_REST_Request $request)
 
     return new WP_REST_Response(array('message' => 'Option ajoutée avec succès'), 200);
 }
+/**
+ * Ajoute plusieurs nouvelles options.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response
+ */
 function add_multiOptions($request) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'booker67_options';
@@ -825,7 +852,6 @@ function add_multiOptions($request) {
 
     return new WP_REST_Response('Options enregistrées avec succès', 200);
 }
-
 /**
  * Met à jour une option existante.
  *
@@ -852,7 +878,6 @@ function update_option_by_id(WP_REST_Request $request)
 
     return new WP_REST_Response(array('message' => 'Option mise à jour avec succès'), 200);
 }
-
 /**
  * Récupère les options en fonction de leur type générique.
  *
@@ -902,7 +927,6 @@ function count_options_by_generic_type(WP_REST_Request $request)
     // Retourner le compte sous forme de tableau associatif
     return array('count' => intval($count));
 }
-
 //endregion
 //region prestation_callback
 function save_prestation($data)
@@ -935,8 +959,6 @@ function save_prestation($data)
     // Retour du résultat
     return new WP_REST_Response('Prestation sauvegardée avec succès', 200);
 }
-
-
 function get_prestations(WP_REST_Request $request)
 {
     global $wpdb;
@@ -957,7 +979,6 @@ function get_prestations(WP_REST_Request $request)
     // Retourner une réponse REST API avec les résultats
     return new WP_REST_Response($results, 200);
 }
-
 function get_prestations_by_practitioner_id(WP_REST_Request $request)
 {
     global $wpdb;
@@ -978,7 +999,6 @@ function get_prestations_by_practitioner_id(WP_REST_Request $request)
     // Retourner une réponse REST API avec les résultats
     return new WP_REST_Response($results, 200);
 }
-
 function delete_prestation($data)
 {
     global $wpdb;
@@ -994,7 +1014,6 @@ function delete_prestation($data)
 
     return new WP_REST_Response('Prestation supprimée avec succès', 200);
 }
-
 function update_prestation($data)
 {
     global $wpdb;
@@ -1035,7 +1054,6 @@ function get_prestation_by_id($data) {
     return new WP_REST_Response($prestation, 200);
 }
 //endregion
-
 function get_practician_appointments($data)
 {
     global $wpdb;
@@ -1060,9 +1078,14 @@ function api_add_rdv($request) {
     $prestation_duration = $params['prestation_duration'];
     $rdv_dateTime = $params['rdv_dateTime'];
     $rdv_status = $params['rdv_status'];
-    $customer_id = $params['customer_id'];
     $participants = $params['participants'];
     $observation = $params['observation'];
+    $user_mail = $params['userData']['user_mail'];
+    $user_id = $params['userData']['user_id'];
+    $user_name = $params['userData']['user_name'];
+    $user_firstName = $params['userData']['user_firstName'];
+    $user_lastName = $params['userData']['user_lastName'];
+    $user_phone = $params['userData']['user_phone'];
     // Nom de la table
     $table_name = $wpdb->prefix . 'booker67_rdv';
 
@@ -1075,11 +1098,23 @@ function api_add_rdv($request) {
             'prestation_duration' => $prestation_duration,
             'rdv_dateTime' => $rdv_dateTime,
             'rdv_status' => $rdv_status,
-            'customer_id' => $customer_id,
             'participants' => $participants,
-            'observation'=> $observation
+            'observation'=> $observation,
+            'user_mail' => $user_mail,
+            'user_id' => $user_id ? $user_id : null, // Gérer le cas où user_id peut être null
+            'user_name' => $user_name,
+            'user_firstName' => $user_firstName,
+            'user_lastName' => $user_lastName,
+            'user_phone' => $user_phone
+
         ),
-        array('%d', '%d', '%s', '%s', '%d', '%d','%d','%s')
+        array('%d', '%d', '%s', '%s', '%d', '%d','%d','%s',
+            '%s', // format pour user_mail
+            '%d', // format pour user_id (peut être null)
+            '%s', // format pour user_name
+            '%s', // format pour user_firstName
+            '%s', // format pour user_lastName
+            '%s' ) // format pour user_phone
     );
 
     // Vérification du résultat de l'insertion
@@ -1087,6 +1122,78 @@ function api_add_rdv($request) {
         return new WP_REST_Response('Rendez-vous ajouté avec succès', 200);
     } else {
         return new WP_REST_Response('Erreur lors de l\'ajout du rendez-vous', 500);
+    }
+}
+function booking67_send_mail(WP_REST_Request $request) {
+    // Sanitisation et validation de l'adresse e-mail
+    $to = sanitize_email($request->get_param('to'));
+    if (!is_email($to)) {
+        return new WP_Error('invalid_email', 'L\'adresse e-mail fournie n\'est pas valide.');
+    }
+
+    // Sanitisation du sujet
+    $subject = sanitize_text_field($request->get_param('subject'));
+
+    // Sanitisation du contenu du message
+    $htmlMessage = wp_kses_post($request->get_param('html'));
+    $plainTextMessage = sanitize_textarea_field($request->get_param('text'));
+
+    $boundary = uniqid('np');
+
+    $headers = array(
+        'Content-Type: multipart/alternative; boundary=' . $boundary,
+        'charset=UTF-8'
+    );
+
+    $message = "--{$boundary}\r\n";
+    $message .= "Content-Type: text/plain; charset=UTF-8\r\n";
+    $message .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
+    $message .= $plainTextMessage . "\r\n\r\n";
+    $message .= "--{$boundary}\r\n";
+    $message .= "Content-Type: text/html; charset=UTF-8\r\n";
+    $message .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
+    $message .= $htmlMessage . "\r\n\r\n";
+    $message .= "--{$boundary}--";
+
+    $sent = wp_mail($to, $subject, $message, $headers);
+
+    if ($sent) {
+        // Email envoyé avec succès
+        return new WP_REST_Response('Email envoyé avec succès.', 200);
+    } else {
+        // Échec de l'envoi de l'email
+        return new WP_Error('email_failed', 'L\'envoi de l\'email a échoué.');
+    }
+}
+function get_current_user_info() {
+    // Vérifie si l'utilisateur est connecté
+    if (is_user_logged_in()) {
+        // Obtient les données de l'utilisateur actuel
+        $current_user = wp_get_current_user();
+
+        // Préparez les données de l'utilisateur à renvoyer
+        $user_data = array(
+            'ID' => $current_user->ID,
+            'user_login' => $current_user->user_login,
+            'user_email' => $current_user->user_email,
+            'user_firstname' => $current_user->user_firstname,
+            'user_lastname' => $current_user->user_lastname,
+            'display_name' => $current_user->display_name
+            // Ajoutez d'autres champs si nécessaire
+        );
+
+        return $user_data;
+    } else {
+        // Retourne false si l'utilisateur n'est pas connecté
+        return false;
+    }
+}
+function api_get_current_user_info(WP_REST_Request $request) {
+    $user_info = get_current_user_info();
+    if ($user_info) {
+        return new WP_REST_Response($user_info, 200);
+    } else {
+        return new WP_Error('not_logged_in', 'Utilisateur non connecté', array('status' => 401));
     }
 }
 function mon_plugin_enqueue_scripts()
