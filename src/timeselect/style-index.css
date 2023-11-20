@@ -41,26 +41,26 @@
   background-color: #e5e5e5;
 }
 
-.booker67-calendar th, .booker67-calendar td {
+.booking67-calendar th, .booking67-calendar td {
   border: 1px solid #e5e5e5;
   text-align: center;
   padding: 5px 10px;
 }
-.booker67-calendar .booker67-day {
+.booking67-calendar .booking67-day {
   cursor: default;
 }
-.booker67-calendar .booker67-day a {
+.booking67-calendar .booking67-day a {
   text-decoration: none;
   color: inherit;
 }
-.booker67-calendar .booker67-day.booker67-day-available {
+.booking67-calendar .booking67-day.booking67-day-available {
   background-color: #f9f9f9;
   cursor: pointer;
 }
-.booker67-calendar .booker67-day.booker67-day-available a {
+.booking67-calendar .booking67-day.booking67-day-available a {
   color: #0073aa;
 }
-.booker67-calendar .booker67-day.booker67-today {
+.booking67-calendar .booking67-day.booking67-today {
   border: 2px solid red;
   box-sizing: border-box;
 }

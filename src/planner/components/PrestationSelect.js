@@ -13,7 +13,7 @@ function PrestationSelect({practitionerId, onPrestationChange}) {
         const fetchPrestations = async () => {
             // Construire l'URL en fonction de l'existence de practitionerId
             if (practitionerId !== 0 && practitionerId !== undefined) {
-                let url = '/wp-json/booker67/v1/prestations';
+                let url = '/wp-json/booking67/v1/prestations';
                 if (practitionerId) {
                     url += `/practitioner_id/${practitionerId}`;
                 }

@@ -6,7 +6,7 @@ function ActiveHumans({ users, setUsers }) {
     const [loading, setLoading] = useState(false); // modifier a true si mise en place du loader
 /*
     useEffect(() => {
-        fetch('/wp-json/booker67/v1/human_ressources_actif', {  // Ajustez l'URL en fonction de votre API
+        fetch('/wp-json/booking67/v1/human_ressources_actif', {  // Ajustez l'URL en fonction de votre API
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -13,7 +13,7 @@ function HumanList() {
     const [activeUsers, setActiveUsers] = useState([]);
 
     useEffect(() => {
-        fetch('/wp-json/booker67/v1/human_ressources_actif', {  // Ajustez l'URL en fonction de votre API
+        fetch('/wp-json/booking67/v1/human_ressources_actif', {  // Ajustez l'URL en fonction de votre API
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -26,7 +26,7 @@ function HumanList() {
             .catch(error => console.error('Error fetching active users:', error));
     }, []);
     useEffect(() => {
-        fetch('/wp-json/booker67/v1/human_ressources_inactif', {  // Ajustez l'URL en fonction de votre API
+        fetch('/wp-json/booking67/v1/human_ressources_inactif', {  // Ajustez l'URL en fonction de votre API
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -74,7 +74,7 @@ function HumanList() {
     };
     function updateUserStatus(userId, stat) {
         console.log(' tentative de mise a jour de Id:  ', userId);
-        fetch('/wp-json/booker67/v1/update_human_ressources_status', {
+        fetch('/wp-json/booking67/v1/update_human_ressources_status', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -19,7 +19,7 @@ function GenericOptionsAdder({ maxAllowed, genericTypeProp }) {
             };
 
             try {
-                const response = await fetch('/wp-json/booker67/v1/options', {
+                const response = await fetch('/wp-json/booking67/v1/options', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

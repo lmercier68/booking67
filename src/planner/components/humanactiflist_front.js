@@ -5,7 +5,7 @@ function HumanRessourcesActifSelect({ onPractitionerChange }) {
 	const [data, setData] = useState([]);
 
 	useEffect(() => {
-		fetch('/wp-json/booker67/v1/human_ressources_actif')
+		fetch('/wp-json/booking67/v1/human_ressources_actif')
 			.then(response => response.json())
 			.then(result => {
 				setData(result);

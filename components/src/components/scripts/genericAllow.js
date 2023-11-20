@@ -1,5 +1,5 @@
 // URL de base pour les requêtes API
-const BASE_URL = '/wp-json/booker67/v1';
+const BASE_URL = '/wp-json/booking67/v1';
 
 /**
  * Vérifie si une nouvelle option peut être insérée en fonction de maxAllowed.

@@ -92,7 +92,7 @@ const App = () => {
     });
     const handlePractitionerChange = async (id) => {
 
-        const url = `/wp-json/booker67/v1/human-ressource/${id}`;
+        const url = `/wp-json/booking67/v1/human-ressource/${id}`;
 
         try {
             const response = await fetch(url);
@@ -115,7 +115,7 @@ const handleParticipantsChange = (nb)=>{
 const handlePrestationChange = async (id) => {
     console.log('handleprestation change');
     setSelectedPrestationId(id);
-    const url = `/wp-json/booker67/v1/prestation/${id}`;
+    const url = `/wp-json/booking67/v1/prestation/${id}`;
 
     try {
         const response = await fetch(url);

@@ -44,7 +44,7 @@ function OptionsComponent() {
     }
     const handleSubmit = async () => {
         try {
-            const response = await fetch('/wp-json/booker67/v1/multiOptions', {
+            const response = await fetch('/wp-json/booking67/v1/multiOptions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(options)

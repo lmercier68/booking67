@@ -20,7 +20,7 @@ function PrestationForm() {
         console.log(practitionerId);
         setPracticianId(practitionerId);
 
-        fetch(`/wp-json/booker67/v1/prestations/practitioner_id/${practitionerId}`)
+        fetch(`/wp-json/booking67/v1/prestations/practitioner_id/${practitionerId}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -37,7 +37,7 @@ function PrestationForm() {
             });
     };
     const handleDelete = (prestationId) => {
-        fetch(`/wp-json/booker67/v1/prestations/${prestationId}`, {
+        fetch(`/wp-json/booking67/v1/prestations/${prestationId}`, {
             method: 'DELETE',
         })
             .then((response) => {
@@ -54,7 +54,7 @@ function PrestationForm() {
             });
     };
     useEffect(() => {
-        fetch('/wp-json/booker67/v1/options/generic_type/genType_prestation')
+        fetch('/wp-json/booking67/v1/options/generic_type/genType_prestation')
             .then(response => response.json())
             .then(result => {
                 setPrestationsList(result);
@@ -76,7 +76,7 @@ function PrestationForm() {
             prestation_duration: prestationDuration,
         };
 
-        fetch('/wp-json/booker67/v1/prestations', {
+        fetch('/wp-json/booking67/v1/prestations', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ function PrestationForm() {
 
 // Fonction pour charger les prestations assignées à un praticien
     const loadAssignedPrestations = (practicianId) => {
-        fetch(`/wp-json/booker67/v1/prestations/practitioner_id/${practicianId}`)
+        fetch(`/wp-json/booking67/v1/prestations/practitioner_id/${practicianId}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -128,7 +128,7 @@ function PrestationForm() {
 
     const handleSaveEdit = (editedPrestation) => {
         // Mise à jour de la prestation en base de données
-        fetch(`/wp-json/booker67/v1/prestations/${editedPrestation.id}`, {
+        fetch(`/wp-json/booking67/v1/prestations/${editedPrestation.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

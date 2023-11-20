@@ -47,27 +47,27 @@
 }
 
 // Styles pour le calendrier, basés sur les échanges précédents
-.booker67-calendar {
+.booking67-calendar {
 	th, td {
 		border: 1px solid #e5e5e5;
 		text-align: center;
 		padding: 5px 10px;
 	}
 
-	.booker67-day {
+	.booking67-day {
 		cursor: default;
 		a {
 			text-decoration: none;
 			color: inherit;
 		}
-		&.booker67-day-available {
+		&.booking67-day-available {
 			background-color: #f9f9f9;
 			cursor: pointer;
 			a {
 				color: #0073aa;
 			}
 		}
-		&.booker67-today {
+		&.booking67-today {
 			border: 2px solid red;
 			box-sizing: border-box;
 		}

@@ -87,6 +87,7 @@ const Modal_Appointment_Validation = ({
         return email.replace(/[^a-zA-Z0-9@._-]/g, '').trim();
     };
     // Gestionnaire de soumission du formulaire
+//handle d'envoi de la prise de rendez-vous
     const handleSubmit = (e) => {
         e.preventDefault();
 

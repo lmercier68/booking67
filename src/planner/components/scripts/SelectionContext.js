@@ -22,8 +22,8 @@ export const SelectionProvider = ({ children }) => {
 
 
 		setLoading(true);
-		console.log('Fetching data with URL:', `/wp-json/booker67/v1/availability?value=${selectedValue}`);
-		fetch(`/wp-json/booker67/v1/availability?value=${selectedValue}`)
+		console.log('Fetching data with URL:', `/wp-json/booking67/v1/availability?value=${selectedValue}`);
+		fetch(`/wp-json/booking67/v1/availability?value=${selectedValue}`)
 			.then(response => response.json())
 			.then(data => {
 				console.log('Received data:', data);
@@ -44,8 +44,8 @@ export const SelectionProvider = ({ children }) => {
 
 		setSelectedValue(selectedValue);
 
-		console.log('Fetching data with URL:', `/wp-json/booker67/v1/availability?value=${selectedValue}`);
-		fetch(`/wp-json/booker67/v1/availability?value=${selectedValue}`)
+		console.log('Fetching data with URL:', `/wp-json/booking67/v1/availability?value=${selectedValue}`);
+		fetch(`/wp-json/booking67/v1/availability?value=${selectedValue}`)
 			.then(response => response.json())
 			.then(data => {
 				console.log('Received data:', data);

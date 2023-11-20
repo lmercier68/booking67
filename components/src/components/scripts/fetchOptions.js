@@ -1,7 +1,7 @@
 async function fetchOptions(types) {
 
     try {
-        let url = new URL('https://wordpress-react-test.local/wp-json/booker67/v1/options/filter');
+        let url = new URL('https://wordpress-react-test.local/wp-json/booking67/v1/options/filter');
         types.forEach(type => url.searchParams.append('types[]', type));
         const response = await fetch(url);
 

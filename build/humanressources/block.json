@@ -1,7 +1,7 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "booker67/humanressources",
+  "name": "booking67/humanressources",
   "version": "0.1.0",
   "title": "Human ressources",
   "category": "widgets",
@@ -11,7 +11,7 @@
   "supports": {
     "html": false
   },
-  "textdomain": "booker67",
+  "textdomain": "booking67",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",

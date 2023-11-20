@@ -45,22 +45,22 @@ export default function Save( { attributes } ) {
 			const isToday = (today.getDate() === dayNumber && today.getMonth() === new Date().getMonth() && today.getFullYear() === new Date().getFullYear());
 
 			if (isToday) {
-				return <td key={dayNumber} className="booker67-day booker67-today"><a href="#">{dayNumber}</a></td>;
+				return <td key={dayNumber} className="booking67-day booking67-today"><a href="#">{dayNumber}</a></td>;
 			} else if (attributes.days[dayName]) {
-				return <td key={dayNumber} className="booker67-day"><a href="#">{dayNumber}</a></td>;
+				return <td key={dayNumber} className="booking67-day"><a href="#">{dayNumber}</a></td>;
 			} else {
-				return <td key={dayNumber} className="booker67-day-disabled">{dayNumber}</td>;
+				return <td key={dayNumber} className="booking67-day-disabled">{dayNumber}</td>;
 			}
 		});
 
 		// Remplir les jours vides au début du mois
 		for (let i = 0; i < startDay; i++) {
-			days.unshift(<td key={'start-empty-' + i} className="booker67-day-empty"></td>);
+			days.unshift(<td key={'start-empty-' + i} className="booking67-day-empty"></td>);
 		}
 
 		// Remplir les jours vides à la fin du mois pour compléter la dernière semaine
 		while (days.length % 7 !== 0) {
-			days.push(<td key={'end-empty-' + days.length} className="booker67-day-empty"></td>);
+			days.push(<td key={'end-empty-' + days.length} className="booking67-day-empty"></td>);
 		}
 
 		// Convertir la liste des jours en lignes de semaine
@@ -74,7 +74,7 @@ export default function Save( { attributes } ) {
 		}
 
 		return (
-			<table className="booker67-calendar">
+			<table className="booking67-calendar">
 				<thead>
 				<tr>
 					{daysOfWeek.map(day => <th key={day}>{day}</th>)}
@@ -131,18 +131,18 @@ export default function Save({ attributes }) {
 		if (isToday) {
 			if (slotsAvailable) {
 				return (
-					<td key={dayNumber} className="booker67-day booker67-day-available" data-dayname={dayName}>
+					<td key={dayNumber} className="booking67-day booking67-day-available" data-dayname={dayName}>
 						<a href="#">{dayNumber}</a>
 					</td>
 				);
 			} else {
-				return <td key={dayNumber} className="booker67-day booker67-today">{dayNumber}</td>;
+				return <td key={dayNumber} className="booking67-day booking67-today">{dayNumber}</td>;
 			}
 		} else if (slotsAvailable) {
 			return (
 				<td
 					key={dayNumber}
-					className="booker67-day booker67-day-available"
+					className="booking67-day booking67-day-available"
 					data-dayname={dayName}
 					data-slots={attributes[dayName].join(',')} // Si vous stockez les créneaux horaires en tant que tableau
 				>
@@ -150,12 +150,12 @@ export default function Save({ attributes }) {
 				</td>
 			);
 		} else {
-			return <td key={dayNumber} className="booker67-day">{dayNumber}</td>;
+			return <td key={dayNumber} className="booking67-day">{dayNumber}</td>;
 		}
 	});
 
 	return (
-		<table className="booker67-calendar">
+		<table className="booking67-calendar">
 			<thead>
 			<tr>
 				{daysOfWeek.map(day => <th key={day}>{day}</th>)}

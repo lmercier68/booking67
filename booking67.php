@@ -12,7 +12,7 @@
  *
  * @package           bookering
  */
-
+require_once(plugin_dir_path(__FILE__) . './php/DataTables.php');
 
 // Ajout d'une action pour le menu d'administration
 add_action('admin_menu', 'my_custom_admin_menu');
@@ -125,7 +125,7 @@ function load_cra_app($hook_suffix)
 add_action('admin_enqueue_scripts', 'load_cra_app');
 
 
-function booker67_enqueue_public_scripts()
+function booking67_enqueue_public_scripts()
 {
 // Enqueue Bootstrap CSS
     wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css', array(), null);
@@ -148,142 +148,22 @@ function booker67_enqueue_public_scripts()
 
 }
 
-add_action('wp_enqueue_scripts', 'booker67_enqueue_public_scripts');
+add_action('wp_enqueue_scripts', 'booking67_enqueue_public_scripts');
 
 
 
-//region database_table_creation
-// Création de la table "booker67_human_ressource" lors de l'activation du plugin
-function create_booking67_human_ressources_table()
-{
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressource';
+//region database_table_creation_hook
+register_activation_hook(__FILE__, 'booking67_create_human_ressources_table');
+register_activation_hook(__FILE__, 'booking67_create_practician_availability_table');
+register_activation_hook(__FILE__, 'booking67_create_options_table');
+register_activation_hook(__FILE__, 'booking67_create_prestations_table');
+register_activation_hook(__FILE__, 'booking67_create_rdv_table');
 
-    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
-            id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            nom VARCHAR(255) NOT NULL,
-            prenom VARCHAR(255) NOT NULL,
-            role VARCHAR(255) NOT NULL,
-            actif BOOLEAN NOT NULL DEFAULT 1
-        ) $charset_collate;";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
-}
-
-register_activation_hook(__FILE__, 'create_booking67_human_ressources_table');
-
-function create_practician_availability_table()
-{
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'practician_availability';
-
-    // Vérifiez si la table existe déjà
-    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE $table_name (
-            id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            practician_id INT(11) UNSIGNED NOT NULL,
-            day_name VARCHAR(50) NOT NULL,
-            opening_time TIME NOT NULL,
-            closing_time TIME NOT NULL
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
-}
-
-register_activation_hook(__FILE__, 'create_practician_availability_table');
-
-function create_booker67_options_table()
-{
-    global $wpdb;
-
-    $charset_collate = $wpdb->get_charset_collate();
-    $table_name = $wpdb->prefix . 'booker67_options';
-
-    $sql = "CREATE TABLE $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        generic_type varchar(255) NOT NULL,
-        value text NOT NULL,
-        PRIMARY KEY  (id)
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-
-register_activation_hook(__FILE__, 'create_booker67_options_table');
-function create_prestations_table()
-{
-    global $wpdb;
-
-    $table_name = $wpdb->prefix . 'booker67_prestations';
-
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        practitioner_id mediumint(9) NOT NULL,
-        prestation_name tinytext NOT NULL,
-        prestation_cost float NOT NULL,
-        prestation_duration time NOT NULL,
-        PRIMARY KEY  (id)
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-
-register_activation_hook(__FILE__, 'create_prestations_table');
-
-function create_rdv_table()
-{
-    global $wpdb;
-
-    // Nom de la table
-    $table_name = $wpdb->prefix . 'booker67_rdv';
-
-
-    $charset_collate = $wpdb->get_charset_collate();
-
-    // Création de la table si elle n'existe pas déjà
-    $sql = "CREATE TABLE $table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        practician_id integer NOT NULL,
-        prestation_id integer NOT NULL,
-        prestation_duration time NOT NULL,
-        rdv_dateTime datetime NOT NULL,
-        rdv_status integer NOT NULL,
-        participants integer,
-        observation text,
-        user_mail varchar(255) DEFAULT NULL,
-        user_id integer DEFAULT NULL,
-        user_name varchar(255) DEFAULT NULL,
-        user_firstName varchar(255) DEFAULT NULL,
-        user_lastName varchar(255) DEFAULT NULL,
-        user_phone varchar(20) DEFAULT NULL,
-        PRIMARY KEY  (id)
-    ) $charset_collate;";
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-
-    //insert_random_data_for_testing();
-
-}
-
-register_activation_hook(__FILE__, 'create_rdv_table');
-
-
+//endregion
 function insert_random_data_for_testing()
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_rdv';
+    $table_name = $wpdb->prefix . 'booking67_rdv';
 
     // Génération de données aléatoires
     for ($i = 0; $i < 10; $i++) {
@@ -317,7 +197,7 @@ function insert_random_data_for_testing()
 function add_human_ressource(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $table_name = $wpdb->prefix . 'booking67_human_ressources';
 
     // Récupération et assainissement des données
     $nom = sanitize_text_field($request->get_param('nom'));
@@ -340,7 +220,7 @@ function add_human_ressource(WP_REST_Request $request)
     return new WP_REST_Response(array('success' => true, 'message' => 'Ressource ajoutée avec succès.'), 200);
 }
 
-//endregion
+
 // Ajout de la route pour l'API REST
 add_action('rest_api_init', function () {
 //region human_ressources
@@ -351,35 +231,33 @@ add_action('rest_api_init', function () {
             return current_user_can('manage_options');
         }
     ));
-// Enregistrement des routes et des endpoints pour l'API REST de WordPress.
-
 // Route pour ajouter une nouvelle ressource humaine.
-    register_rest_route('booker67/v1', '/human_ressources', array(
+    register_rest_route('booking67/v1', '/human_ressources', array(
         'methods' => WP_REST_Server::CREATABLE,  // Correspond à la méthode POST
         'callback' => 'add_human_ressource',     // Fonction callback qui sera exécutée
         'permission_callback' => '__return_true' // Tout le monde a la permission
     ));
 
 // Route pour récupérer les ressources humaines actives.
-    register_rest_route('booker67/v1', '/human_ressources_actif', array(
+    register_rest_route('booking67/v1', '/human_ressources_actif', array(
         'methods' => 'GET',
         'callback' => 'get_human_ressources_actif',
         'permission_callback' => '__return_true'
     ));
 
 // Route pour récupérer les ressources humaines inactives.
-    register_rest_route('booker67/v1', '/human_ressources_inactif', array(
+    register_rest_route('booking67/v1', '/human_ressources_inactif', array(
         'methods' => 'GET',
         'callback' => 'get_human_ressources_inactif',
         'permission_callback' => '__return_true'
     ));
 
 // Route pour mettre à jour le statut d'une ressource humaine.
-    register_rest_route('booker67/v1', '/update_human_ressources_status', array(
+    register_rest_route('booking67/v1', '/update_human_ressources_status', array(
         'methods' => 'POST',
         'callback' => 'update_human_ressources_status'
     ));
-    register_rest_route('booker67/v1', '/human-ressource/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/human-ressource/(?P<id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_human_ressource_by_id',
         'permission_callback' => '__return_true' // Vous pouvez également définir une fonction de rappel de permission ici
@@ -387,7 +265,7 @@ add_action('rest_api_init', function () {
 //endregion
 //region availability
 // Route pour insérer une nouvelle disponibilité pour un praticien.
-    register_rest_route('booker67/v1', '/availability', array(
+    register_rest_route('booking67/v1', '/availability', array(
         'methods' => 'POST',
         'callback' => 'insert_practician_availability',
         'permission_callback' => function () {
@@ -396,17 +274,17 @@ add_action('rest_api_init', function () {
     ));
 
 // Route pour obtenir les disponibilités des praticien.
-    register_rest_route('booker67/v1', '/availability', array(
+    register_rest_route('booking67/v1', '/availability', array(
         'methods' => 'GET',
         'callback' => 'get_practician_availabilities',
         'permission_callback' => '__return_true'
     ));
-    register_rest_route('booker67/v1', '/availability/(?P<practician_id>\d+)', array(
+    register_rest_route('booking67/v1', '/availability/(?P<practician_id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_practician_availability_by_practician',
     ));
 // Route pour mettre à jour une disponibilité.
-    register_rest_route('booker67/v1', '/availability/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/availability/(?P<id>\d+)', array(
         'methods' => WP_REST_Server::EDITABLE,
         'callback' => 'handle_update_availability',
         'args' => array(
@@ -441,18 +319,18 @@ add_action('rest_api_init', function () {
     ));
 
 // Route pour supprimer une disponibilité.
-    register_rest_route('booker67/v1', '/availability/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/availability/(?P<id>\d+)', array(
         'methods' => 'DELETE',
         'callback' => 'delete_availability'
     ));
 //endregion
 //region options_route
     /* Route pour récupérer toutes les options.*/
-    register_rest_route('booker67/v1', '/options', array(
+    register_rest_route('booking67/v1', '/options', array(
         'methods' => 'GET',
         'callback' => 'get_all_options'
     ));
-    register_rest_route('booker67/v1', '/options/filter', array(
+    register_rest_route('booking67/v1', '/options/filter', array(
         'methods' => 'GET',
         'callback' => 'get_filtered_options',
         'args' => array(
@@ -465,55 +343,55 @@ add_action('rest_api_init', function () {
     ));
 
     /* Route pour ajouter une nouvelle option.*/
-    register_rest_route('booker67/v1', '/options', array(
+    register_rest_route('booking67/v1', '/options', array(
         'methods' => 'POST',
         'callback' => 'add_options'
     ));
-    register_rest_route('booker67/v1', '/multiOptions', array(
+    register_rest_route('booking67/v1', '/multiOptions', array(
         'methods' => 'POST',
         'callback' => 'add_multiOptions'
     ));
     /* Route pour mettre à jour une option en utilisant son ID.*/
-    register_rest_route('booker67/v1', '/options/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/options/(?P<id>\d+)', array(
         'methods' => 'POST',
         'callback' => 'update_option_by_id'
     ));
 
     /* Route pour récupérer les options par type générique.*/
-    register_rest_route('booker67/v1', '/options/generic_type/(?P<type>[a-zA-Z0-9-_]+)', array(
+    register_rest_route('booking67/v1', '/options/generic_type/(?P<type>[a-zA-Z0-9-_]+)', array(
         'methods' => 'GET',
         'callback' => 'get_options_by_generic_type'
     ));
 
     /* Route pour compter les options par type générique.*/
-    register_rest_route('booker67/v1', '/options/generic_type_count/(?P<type>[a-zA-Z0-9-_]+)', array(
+    register_rest_route('booking67/v1', '/options/generic_type_count/(?P<type>[a-zA-Z0-9-_]+)', array(
         'methods' => 'GET',
         'callback' => 'count_options_by_generic_type'
     ));
 //endregion
 //region prestations_route
-    register_rest_route('booker67/v1', '/prestations', array(
+    register_rest_route('booking67/v1', '/prestations', array(
         'methods' => 'POST',
         'callback' => 'save_prestation',
 
     ));
 
-    register_rest_route('booker67/v1', '/prestations', array(
+    register_rest_route('booking67/v1', '/prestations', array(
         'methods' => 'GET',
         'callback' => 'get_prestations',
 
     ));
 
-    register_rest_route('booker67/v1', '/prestations/practitioner_id/(?P<practitioner_id>\d+)', array(
+    register_rest_route('booking67/v1', '/prestations/practitioner_id/(?P<practitioner_id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_prestations_by_practitioner_id',
     ));
-    register_rest_route('booker67/v1', '/prestations/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/prestations/(?P<id>\d+)', array(
         'methods' => 'DELETE',
         'callback' => 'delete_prestation',
 
     ));
-    register_rest_route('booker67/v1', '/prestations/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/prestations/(?P<id>\d+)', array(
         'methods' => 'PUT',
         'callback' => 'update_prestation',
         'args' => array(
@@ -537,18 +415,18 @@ add_action('rest_api_init', function () {
             ),
         ),
     ));
-    register_rest_route('booker67/v1', '/prestation/(?P<id>\d+)', array(
+    register_rest_route('booking67/v1', '/prestation/(?P<id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_prestation_by_id',
         'permission_callback' => '__return_true'
     ));
 //endregion
 //region appointement
-    register_rest_route('booker67/v1', '/appointments/(?P<practician_id>\d+)', array(
+    register_rest_route('booking67/v1', '/appointments/(?P<practician_id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_practician_appointments',
     ));
-    register_rest_route('booker67/v1', '/add-rdv/', array(
+    register_rest_route('booking67/v1', '/add-rdv/', array(
         'methods' => 'POST',
         'callback' => 'api_add_rdv',
     ));
@@ -578,7 +456,7 @@ add_action('rest_api_init', function () {
 function get_human_ressources_actif(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $table_name = $wpdb->prefix . 'booking67_human_ressources';
     $results = $wpdb->get_results("SELECT id, nom, prenom, role FROM $table_name WHERE actif = 1", ARRAY_A);
     return $results;
 }
@@ -592,7 +470,7 @@ function get_human_ressources_actif(WP_REST_Request $request)
 function get_human_ressources_inactif(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $table_name = $wpdb->prefix . 'booking67_human_ressources';
     $results = $wpdb->get_results("SELECT id, nom, prenom, role FROM $table_name WHERE actif = 0", ARRAY_A);
     return $results;
 }
@@ -609,7 +487,7 @@ function update_human_ressources_status(WP_REST_Request $request)
     $status = $request->get_param('actif'); // "actif" ou "inactif"
 
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $table_name = $wpdb->prefix . 'booking67_human_ressources';
     $wpdb->update(
         $table_name,
         array('actif' => $status),
@@ -620,7 +498,7 @@ function update_human_ressources_status(WP_REST_Request $request)
 }
 function get_human_ressource_by_id($data) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_human_ressources';
+    $table_name = $wpdb->prefix . 'booking67_human_ressources';
     $id = $data['id'];
 
     $result = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
@@ -642,7 +520,7 @@ function get_human_ressource_by_id($data) {
 function insert_practician_availability(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'practician_availability';
+    $table_name = $wpdb->prefix . 'booking67_practician_availability';
 
     $practician_id = intval($request->get_param('practician_id'));
     $day_name = sanitize_text_field($request->get_param('day_name'));
@@ -672,7 +550,7 @@ function insert_practician_availability(WP_REST_Request $request)
 function get_practician_availabilities(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'practician_availability';
+    $table_name = $wpdb->prefix . 'booking67_practician_availability';
 
     $practician_id = $request->get_param('value');
 
@@ -689,7 +567,7 @@ function get_practician_availability_by_practician($data)
 {
     global $wpdb;
     $practician_id = $data['practician_id'];
-    $table_name = $wpdb->prefix . 'practician_availability';
+    $table_name = $wpdb->prefix . 'booking67_practician_availability';
 
     $results = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM $table_name WHERE practician_id = %d",
@@ -712,7 +590,7 @@ function get_practician_availability_by_practician($data)
 function handle_update_availability($request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'practician_availability';
+    $table_name = $wpdb->prefix . 'booking67_practician_availability';
 
     $id = $request['id'];
     $practician_id = $request['practician_id'];
@@ -750,7 +628,7 @@ function handle_update_availability($request)
 function delete_availability($data)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'practician_availability';
+    $table_name = $wpdb->prefix . 'booking67_practician_availability';
     $id = $data['id'];
 
     $deleted = $wpdb->delete($table_name, array('id' => $id));
@@ -772,14 +650,14 @@ function delete_availability($data)
 function get_all_options()
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
     $results = $wpdb->get_results("SELECT * FROM $table_name");
     return $results;
 }
 function get_filtered_options(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
 
     // Récupérer les types des paramètres de la requête
     $types = $request->get_param('types');
@@ -807,7 +685,7 @@ function get_filtered_options(WP_REST_Request $request)
 function add_options(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
 
     $generic_type = sanitize_text_field($request->get_param('generic_type'));
     $value = sanitize_text_field($request->get_param('value'));
@@ -827,7 +705,7 @@ function add_options(WP_REST_Request $request)
  */
 function add_multiOptions($request) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
 
     $data = $request->get_json_params();
     foreach ($data as $key => $value) {
@@ -861,7 +739,7 @@ function add_multiOptions($request) {
 function update_option_by_id(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
 
     $id = $request->get_param('id');
     $generic_type = sanitize_text_field($request->get_param('generic_type'));
@@ -889,7 +767,7 @@ function get_options_by_generic_type(WP_REST_Request $request)
     // Accès global à l'objet de la base de données de WordPress
     global $wpdb;
     // Définir le nom de la table en utilisant le préfixe défini dans la configuration de WP
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
     // Nettoyer le paramètre "type" pour éviter des problèmes de sécurité
     $type = sanitize_text_field($request->get_param('type'));
 
@@ -916,7 +794,7 @@ function count_options_by_generic_type(WP_REST_Request $request)
     // Accès global à l'objet de la base de données de WordPress
     global $wpdb;
     // Définir le nom de la table en utilisant le préfixe défini dans la configuration de WP
-    $table_name = $wpdb->prefix . 'booker67_options';
+    $table_name = $wpdb->prefix . 'booking67_options';
 
     // Nettoyer le paramètre "type" pour éviter des problèmes de sécurité
     $type = sanitize_text_field($request->get_param('type'));
@@ -941,7 +819,7 @@ function save_prestation($data)
 
     // Insertion de la prestation dans la table
     $result = $wpdb->insert(
-        $wpdb->prefix . 'booker67_prestations',
+        $wpdb->prefix . 'booking67_prestations',
         array(
             'practitioner_id' => $practician_id,
             'prestation_name' => $prestation_name,
@@ -962,7 +840,7 @@ function save_prestation($data)
 function get_prestations(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $table_name = $wpdb->prefix . 'booking67_prestations';
 
     // Nettoyer le paramètre "practitioner_id" pour éviter des problèmes de sécurité
 
@@ -982,7 +860,7 @@ function get_prestations(WP_REST_Request $request)
 function get_prestations_by_practitioner_id(WP_REST_Request $request)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $table_name = $wpdb->prefix . 'booking67_prestations';
 
     // Nettoyer le paramètre "practitioner_id" pour éviter des problèmes de sécurité
     $practitioner_id = sanitize_text_field($request->get_param('practitioner_id'));
@@ -1003,7 +881,7 @@ function delete_prestation($data)
 {
     global $wpdb;
 
-    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $table_name = $wpdb->prefix . 'booking67_prestations';
     $prestation_id = $data['id'];
 
     $result = $wpdb->delete($table_name, array('id' => $prestation_id));
@@ -1017,7 +895,7 @@ function delete_prestation($data)
 function update_prestation($data)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $table_name = $wpdb->prefix . 'booking67_prestations';
 
     $prestation_id = $data['id'];
     $prestation_cost = $data['prestation_cost'];
@@ -1042,7 +920,7 @@ function update_prestation($data)
 }
 function get_prestation_by_id($data) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'booker67_prestations';
+    $table_name = $wpdb->prefix . 'booking67_prestations';
     $id = $data['id'];
 
     $prestation = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id), ARRAY_A);
@@ -1058,7 +936,7 @@ function get_practician_appointments($data)
 {
     global $wpdb;
     $practician_id = $data['practician_id'];
-    $table_name = $wpdb->prefix . 'booker67_rdv';
+    $table_name = $wpdb->prefix . 'booking67_rdv';
 
     // Récupération des enregistrements de la base de données
     $appointments = $wpdb->get_results(
@@ -1087,7 +965,7 @@ function api_add_rdv($request) {
     $user_lastName = $params['userData']['user_lastName'];
     $user_phone = $params['userData']['user_phone'];
     // Nom de la table
-    $table_name = $wpdb->prefix . 'booker67_rdv';
+    $table_name = $wpdb->prefix . 'booking67_rdv';
 
     // Insertion dans la base de données
     $result = $wpdb->insert(

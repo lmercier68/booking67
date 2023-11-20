@@ -69,7 +69,7 @@ function TimeSelectEdit({ apiRoot, apiNonce }) {
 	};
 
 	const saveSelectedSlots = () => {
-		fetch(`${apiRoot}booker67/v1/save-times`, {
+		fetch(`${apiRoot}booking67/v1/save-times`, {
 			method: 'POST',
 			headers: {
 				'X-WP-Nonce': apiNonce,
@@ -95,7 +95,7 @@ function TimeSelectEdit({ apiRoot, apiNonce }) {
 
 	useEffect(() => {
 		if (selectedDate) {
-			fetch(`${apiRoot}booker67/v1/get-times?date=${selectedDate}`, {
+			fetch(`${apiRoot}booking67/v1/get-times?date=${selectedDate}`, {
 				method: 'GET',
 				headers: {
 					'X-WP-Nonce': apiNonce
@@ -113,7 +113,7 @@ function TimeSelectEdit({ apiRoot, apiNonce }) {
 
 	const bookSelectedSlot = () => {
 		if (selectedSlot) {
-			fetch(`${apiRoot}booker67/v1/book-time`, {
+			fetch(`${apiRoot}booking67/v1/book-time`, {
 				method: 'POST',
 				headers: {
 					'X-WP-Nonce': apiNonce,

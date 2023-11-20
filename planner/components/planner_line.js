@@ -73,7 +73,7 @@ function PlannerLine({ day_name = "Day", onChange, dayStyle, availabilities = []
 			return;
 		}
 
-		fetch(`/wp-json/booker67/v1/availability/${idToDelete}`, {
+		fetch(`/wp-json/booking67/v1/availability/${idToDelete}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

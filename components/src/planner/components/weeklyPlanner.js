@@ -47,7 +47,7 @@ function WeeklyPlanner() {
 		};
 console.log('postData: ', postData);
 		// Déterminez l'URL et la méthode basées sur si l'id est défini
-		const url = value.id ? `/wp-json/booker67/v1/availability/${value.id}` : '/wp-json/booker67/v1/availability';
+		const url = value.id ? `/wp-json/booking67/v1/availability/${value.id}` : '/wp-json/booking67/v1/availability';
 		const method = value.id? 'PUT' : 'POST';
 
 		// Envoyer une requête à la route /availability pour sauver ou mettre à jour le créneau
@@ -110,7 +110,7 @@ console.log('postData: ', postData);
 		}).flat();
 
 		// Envoyer les données à l'API
-		fetch('/wp-json/booker67/v1/availability', {
+		fetch('/wp-json/booking67/v1/availability', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

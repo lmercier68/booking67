@@ -52,7 +52,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
         // Vous pouvez également effectuer d'autres actions ici si nécessaire
     };
     const booking67_addNewRdv = async (practicianId, prestationId, prestationDuration, rdvDateTime, rdvStatus, customerId,participants,observation,userData) => {
-        const apiUrl = '/wp-json/booker67/v1/add-rdv/';
+        const apiUrl = '/wp-json/booking67/v1/add-rdv/';
         // Création du corps de la requête
         const data = {
             practician_id: practicianId,
@@ -116,7 +116,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
             }
             // Fetch booked appointments
             try {
-                const response = await fetch(`/wp-json/booker67/v1/appointments/${pract_id}`);
+                const response = await fetch(`/wp-json/booking67/v1/appointments/${pract_id}`);
                 const data = await response.json();
                 let dataConvert = data.map(appointment => {
                     const dateTime = new Date(appointment.rdv_dateTime + 'Z'); // Ajoute 'Z' pour spécifier UTC
@@ -138,7 +138,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
         console.log('fetch availability')
         if ((selectedPractitionerId && selectedPractitionerId !== 0 )) {
             try {
-                const response = await fetch(`/wp-json/booker67/v1/availability/${selectedPractitionerId}`);
+                const response = await fetch(`/wp-json/booking67/v1/availability/${selectedPractitionerId}`);
                 const data = await response.json();
 
                 // Convertir les chaînes de date en objets Date

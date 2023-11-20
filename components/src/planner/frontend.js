@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-	const datepickerEl = document.getElementById('booker67-datepicker');
+	const datepickerEl = document.getElementById('booking67-datepicker');
 	let dateAvailabilityCache = {};  // Cache pour stocker la disponibilité des dates
 
 	function checkDateAvailability(date, callback) {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 		}
 
 		jQuery.ajax({
-			url: '/wp-json/booker67/v1/date_availability',
+			url: '/wp-json/booking67/v1/date_availability',
 			data: { date: formattedDate },
 			success: function(data) {
 				dateAvailabilityCache[formattedDate] = data.availability;
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 	function fetchAvailableTimeSlots(date) {
 		jQuery.ajax({
-			url: '/wp-json/booker67/v1/available_slots',
+			url: '/wp-json/booking67/v1/available_slots',
 			data: { date: date },
 			success: function(data) {
 				openTimeSlotModal(date, data.slots);
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 	function bookTimeSlot(date, time) {
 		jQuery.ajax({
-			url: '/wp-json/booker67/v1/book_slot',
+			url: '/wp-json/booking67/v1/book_slot',
 			method: 'POST',
 			data: {
 				date: date,

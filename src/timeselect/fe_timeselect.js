@@ -1,15 +1,15 @@
 // fe_timeselect.js
 
 jQuery(document).ready(function($) {
-	const apiRoot = booker67ApiSettings.root;
-	const apiNonce = booker67ApiSettings.nonce;
+	const apiRoot = booking67ApiSettings.root;
+	const apiNonce = booking67ApiSettings.nonce;
 	let selectedSlot = null;
 
 	$('.time-select-block .wp-block-datepicker').on('change', function() {
 		const selectedDate = $(this).val();
 
 		$.ajax({
-			url: apiRoot + 'booker67/v1/get-times?date=' + selectedDate,
+			url: apiRoot + 'booking67/v1/get-times?date=' + selectedDate,
 			method: 'GET',
 			beforeSend: function(xhr) {
 				xhr.setRequestHeader('X-WP-Nonce', apiNonce);
@@ -39,7 +39,7 @@ jQuery(document).ready(function($) {
 	$('.time-select-block .select-button').on('click', function() {
 		if (selectedSlot) {
 			$.ajax({
-				url: apiRoot + 'booker67/v1/book-time',
+				url: apiRoot + 'booking67/v1/book-time',
 				method: 'POST',
 				data: {
 					start_time: selectedSlot.start,

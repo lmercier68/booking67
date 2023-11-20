@@ -46,7 +46,7 @@ export default function Edit( props ) {
 		});
 	function saveTimesToDatabase() {
 		apiFetch({
-			path: '/booker67/v1/save-times',
+			path: '/booking67/v1/save-times',
 			method: 'POST',
 			data: {
 				times: attributes, // Cela enverra tous les jours et leurs créneaux horaires respectifs

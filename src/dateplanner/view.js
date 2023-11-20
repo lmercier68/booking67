@@ -21,5 +21,5 @@
  */
 
 /* eslint-disable no-console */
-console.log( 'Hello World! (from create-block-booker67 block)' );
+console.log( 'Hello World! (from create-block-booking67 block)' );
 /* eslint-enable no-console */

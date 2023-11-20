@@ -13,7 +13,7 @@ function HumanRessourcesForm() {
 
 
 	const handleSubmit = async () => {
-		const response = await fetch('/wp-json/booker67/v1/human_ressources', {
+		const response = await fetch('/wp-json/booking67/v1/human_ressources', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
