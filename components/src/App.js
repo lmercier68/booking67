@@ -6,6 +6,7 @@ import HumanRessourcesform from "./components/humanRessourcesform";
 import GenericOptionsAdder from "./components/GenericOptionsAdder";
 import PrestationForm from "./components/PrestationForm";
 import OptionsComponent from "./components/OptionsComponent";
+import AppointmentsDisplayer from "./components/AppointmentsDisplayer"
 
 function App({page}) {
     console.log('App executed, page:', page);
@@ -19,8 +20,9 @@ function App({page}) {
         return <HumanRessourcesform/>;
     }else if (page === 'prestations') {
         return <PrestationForm/>;
+    }else if (page === 'appointments') {
+        return <AppointmentsDisplayer/>;
     }
-
     return null;
 }
 

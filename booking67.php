@@ -59,6 +59,14 @@ function my_custom_admin_menu()
         'booking67-slug-prestations-submenu',
         'booking67_prestations_page'
     );
+    add_submenu_page(
+        'booking67_options', // Slug du menu parent
+        'Gestion des rendez-vous', // Titre de la page
+        'Rendez-vous', // Titre du menu
+        'manage_options', // Capacité requise pour accéder au menu
+        'booking67-slug-rendezvous-submenu', // Slug du sous-menu
+        'booking67_rendezvous_page' // Fonction pour afficher le contenu de la page
+    );
 
 }
 
@@ -89,7 +97,11 @@ function booking67_personnel_page()
     echo '<h1>Gestion du personnel</h1>';
     echo '<div id="root-personnel" data-page="personnel"></div>';
 }
+function booking67_rendezvous_page() {
+    echo '<h1>Gestion de vos rendez-vous</h1>';
+    echo '<div id="root-disponibilites" data-page="appointments"></div>';
 
+}
 // Fonction pour charger l'application CRA (Create React App) dans l'administration
 function load_cra_app($hook_suffix)
 {
@@ -98,7 +110,8 @@ function load_cra_app($hook_suffix)
             'toplevel_page_booking67_options',
             'booking67_page_booking67-slug-disponibilites-submenu',
             'booking67_page_booking67-slug-personnel-submenu',
-            'booking67_page_booking67-slug-prestations-submenu'
+            'booking67_page_booking67-slug-prestations-submenu',
+            'booking67_page_booking67-slug-rendezvous-submenu',
         ];
 
         // Si ce n'est pas une page du plugin, sortez
@@ -110,7 +123,9 @@ function load_cra_app($hook_suffix)
         $files = glob(__DIR__ . '/components/build/static/js/main.*.js');
         $mainFile = !empty($files) ? basename($files[0]) : 'main.js';
         $script_path = plugins_url('components/build/static/js/' . $mainFile, __FILE__);
-        $style_path = plugins_url('components/build/static/css/main.073c9b0a.css', __FILE__);
+        $filesCSS = glob(__DIR__ . '/components/build/static/css/main.*.css');
+        $mainCSSFile = !empty($files) ? basename($filesCSS[0]) : 'main.css';
+        $style_path = plugins_url('components/build/static/css/'. $mainCSSFile, __FILE__);
 
         // Enregistrement et mise en file d'attente des scripts et styles
         wp_enqueue_script('cra-app-js', $script_path, array(), null, true);
@@ -430,6 +445,12 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'api_add_rdv',
     ));
+    register_rest_route('booking67/v1', '/upcoming-appointments', array(
+        'methods' => 'GET',
+        'callback' => 'get_future_appointments',
+    ));
+    //endregion
+    //region general functions
     register_rest_route('booking67/v1', '/send-mail', array(
         'methods' => 'POST',
         'callback' => 'booking67_send_mail',
@@ -1001,6 +1022,17 @@ function api_add_rdv($request) {
     } else {
         return new WP_REST_Response('Erreur lors de l\'ajout du rendez-vous', 500);
     }
+}
+function get_future_appointments() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'booking67_rdv';
+    $current_datetime = date('Y-m-d H:i:s'); // Date et heure actuelles
+
+    // Requête pour récupérer les rdv dont la date et l'heure ne sont pas encore passées et dont le statut n'est pas 0
+    $query = $wpdb->prepare("SELECT * FROM $table_name WHERE rdv_dateTime > %s AND rdv_status != 0", $current_datetime);
+    $results = $wpdb->get_results($query);
+
+    return rest_ensure_response($results);
 }
 function booking67_send_mail(WP_REST_Request $request) {
     // Sanitisation et validation de l'adresse e-mail

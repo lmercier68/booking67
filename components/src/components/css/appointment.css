@@ -1,0 +1,70 @@
+.appointment-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+}
+
+.appointment-row > div {
+    margin-right: 15px;
+}
+.appointment-status,
+.appointment-date,
+.appointment-time,
+.user-name,
+.user-mail,
+.user-phone,
+.practician-name,
+.prestation-name {
+    min-width: 100px;
+    text-align: left;
+}
+
+.prestation-name {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+.appointment-row:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Style pour les icônes FontAwesome dans les lignes */
+.appointment-row .svg-inline--fa {
+    margin-right: 5px;
+}
+
+
+/* Style pour le loader */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+.waiting {
+    color: orange !important;
+}
+
+.confirmed {
+    color: green !important;
+}
+
+.cancelled {
+    color: red !important;
+}
+
+.postponed {
+    color: blue!important;
+}
+
+.completed {
+    color: purple !important;
+}
+
+.paid {
+    color: gold !important;
+}

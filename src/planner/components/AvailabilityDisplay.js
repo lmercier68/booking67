@@ -87,7 +87,7 @@ const AvailabilityDisplay = ({options,practician,prestation, selectedPractitione
             booking67_fetchAvailability().then(booking67_fetchBookedAppointments());
 
 
-            booking67_sendMail_confirmation('destinataire@example.com', 'Sujet de Test', 'Ceci est un message de test.');
+            booking67_sendMail_confirmation(userData.user_mail, 'Sujet de Test', 'Ceci est un message de test.');
 
         } catch (error) {
             console.error('Erreur:', error);
