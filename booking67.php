@@ -272,6 +272,7 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'update_human_ressources_status'
     ));
+// Route pourrecuperer les info d'une ressource humaine d'apres son id.
     register_rest_route('booking67/v1', '/human-ressource/(?P<id>\d+)', array(
         'methods' => 'GET',
         'callback' => 'get_human_ressource_by_id',

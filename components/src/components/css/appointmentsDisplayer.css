@@ -7,3 +7,27 @@
     height: 50px;
     animation: spin 2s linear infinite;
 }
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* fond semi-transparent */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Assurez-vous que ce soit plus haut que tout autre contenu */
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.modal-close-button {
+
+    margin: 0 auto; /* Centrer le bouton horizontalement */
+    display: block; /* Rendre le bouton comme un block pour permettre le centrage */
+}
