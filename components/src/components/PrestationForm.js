@@ -112,9 +112,11 @@ function PrestationForm() {
                 // Gérer l'erreur ici si nécessaire.
             });
     };
-    const unassignedPrestations = prestationsList.filter(p =>
-        !assignedPrestations.some(ap => ap.prestation_name === p.value)
-    );
+    const unassignedPrestations = prestationsList.length > 0
+        ? prestationsList.filter(p =>
+            !assignedPrestations.some(ap => ap.prestation_name === p.value)
+        )
+        : [];
 
     const handleEdit = (prestation) => {
         setIsEditModalOpen(true);
@@ -185,13 +187,13 @@ function PrestationForm() {
                         onClose={handleCloseEditModal}
                         prestation={prestationToEdit}
                         onSave={handleSaveEdit}
-                    />
-                    <div style={{ marginTop: '20px' }}>
+                    />{unassignedPrestations.length > 0 ? (
+                    <div id="addPrestationToPractician" style={{ marginTop: '20px' }}>
                         <label style={{ marginRight: '20px' }}>
                             Prestation:
                             <select value={selectedPrestation} onChange={(e) => setSelectedPrestation(e.target.value)} style={{ marginLeft: '10px' }}>
                                 <option value="">Choisissez une prestation</option>
-                                {unassignedPrestations.map((prestation) => (
+                                {unassignedPrestations && unassignedPrestations.map((prestation) => (
                                     <option key={prestation.id} value={prestation.value}>
                                         {prestation.value}
                                     </option>
@@ -220,7 +222,13 @@ function PrestationForm() {
                         <button type="submit" style={{ display: 'block', marginTop: '20px', padding: '10px 15px', backgroundColor: '#4CAF50', color: 'white', borderRadius: '5px' }}>
                             Sauvegarder
                         </button>
+                    </div>):(
+                    <div id="addPrestationToPractician" style={{ marginTop: '20px' }}>
+                        <div style={{ marginTop: '20px' }}>
+                            <p>Veuillez d'abord créer une prestation ci-dessus</p>
+                        </div>
                     </div>
+                )}
                 </form>
             </div>
         </div>

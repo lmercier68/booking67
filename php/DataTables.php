@@ -75,6 +75,26 @@ function booking67_create_prestations_table()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
+function booking67_create_ImageMailTable() {
+    global $wpdb;
+    $tableName = $wpdb->prefix . 'imagemail';
+
+    if ($wpdb->get_var("SHOW TABLES LIKE '{$tableName}'") != $tableName) {
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $tableName (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            filename varchar(255) NOT NULL,
+            alt_text varchar(255) DEFAULT '' NOT NULL,
+            url varchar(255) DEFAULT '' NOT NULL,
+            thumbnail_url VARCHAR(255) DEFAULT '' NOT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+}
 function booking67_create_rdv_table()
 {
     global $wpdb;

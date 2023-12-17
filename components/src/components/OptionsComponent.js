@@ -1,5 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import fetchOptions from "./scripts/fetchOptions";
+import EmailComposer from "./EmailComposer";
+import './css/OptionsComponents.css'
 function OptionsComponent() {
     const [options, setOptions] = useState({
         hasFixedTimeSlots: false,
@@ -62,7 +64,7 @@ function OptionsComponent() {
     };
 
     return (
-        <div>
+        <div className='options-container'>
 
             <label>
                 Les rendez-vous ont-ils une heure de début et une heure de fin ?
@@ -152,6 +154,7 @@ function OptionsComponent() {
             </label>
             {/* Autres champs... */}
             <br/>
+            <EmailComposer/>
             <button onClick={handleSubmit}>Enregistrer les Options</button>
         </div>
     );

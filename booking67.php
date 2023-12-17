@@ -150,6 +150,8 @@ function booking67_enqueue_public_scripts()
     wp_enqueue_script('jquery-ui-datepicker');
     wp_enqueue_script('jquery-ui-dialog');
     wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css');
+    wp_enqueue_style('bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', array(), '4.3.1');
+
     wp_enqueue_script(
         'mon-plugin-frontend',
         plugins_url('build/frontend.js', __FILE__),
@@ -173,6 +175,7 @@ register_activation_hook(__FILE__, 'booking67_create_practician_availability_tab
 register_activation_hook(__FILE__, 'booking67_create_options_table');
 register_activation_hook(__FILE__, 'booking67_create_prestations_table');
 register_activation_hook(__FILE__, 'booking67_create_rdv_table');
+register_activation_hook(__FILE__, 'booking67_create_ImageMailTable');
 
 //endregion
 function insert_random_data_for_testing()
@@ -358,6 +361,20 @@ add_action('rest_api_init', function () {
         )
     ));
 
+
+        register_rest_route('booking67/v1', '/upload-image', array(
+            'methods' => 'POST',
+            'callback' => 'handle_image_upload',
+            'permission_callback' => '__return_true'
+        ));
+
+        register_rest_route('booking67/v1', '/get-images', array(
+            'methods' => 'GET',
+            'callback' => 'get_uploaded_images',
+            'permission_callback' => '__return_true'
+        ));
+
+
     /* Route pour ajouter une nouvelle option.*/
     register_rest_route('booking67/v1', '/options', array(
         'methods' => 'POST',
@@ -395,6 +412,7 @@ add_action('rest_api_init', function () {
     register_rest_route('booking67/v1', '/prestations', array(
         'methods' => 'GET',
         'callback' => 'get_prestations',
+
 
     ));
 
@@ -457,7 +475,7 @@ add_action('rest_api_init', function () {
         'callback' => 'booking67_send_mail',
         'permission_callback' =>  '__return_true'
 
-        ));
+    ));
     register_rest_route('booking67/v1', '/current-user', array(
         'methods' => 'GET',
         'callback' => 'api_get_current_user_info',
@@ -1126,3 +1144,82 @@ function booking67_frontend_shortcode()
 }
 
 add_shortcode('booking67_frontend', 'booking67_frontend_shortcode');
+function get_uploaded_images(WP_REST_Request $request) {
+    global $wpdb;
+    $tableName = $wpdb->prefix . 'imagemail';
+
+    // Récupérez les images de la base de données
+    $images = $wpdb->get_results("SELECT * FROM $tableName");
+
+    return new WP_REST_Response($images, 200);
+}
+
+function handle_image_upload(WP_REST_Request $request) {
+    // Assurez-vous que la requête provient d'un utilisateur autorisé
+   /* if (!is_user_logged_in()) {
+        return new WP_Error('rest_forbidden', esc_html__('Vous n\'êtes pas autorisé à uploader des images.', 'my-text-domain'), array('status' => 401));
+    }*/
+
+    $files = $request->get_file_params();
+
+    // Vérifiez si le fichier est correctement uploadé
+    if (empty($files) || !isset($files['image'])) {
+        return new WP_Error('rest_upload_error', esc_html__('Aucun fichier uploadé.', 'my-text-domain'), array('status' => 400));
+    }
+
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
+    require_once(ABSPATH . 'wp-admin/includes/file.php');
+    require_once(ABSPATH . 'wp-admin/includes/media.php');
+
+    // Utilisez wp_handle_upload() pour charger le fichier
+    $upload_overrides = array('test_form' => false);
+    $uploadedfile = $files['image'];
+    $upload = wp_handle_upload($uploadedfile, $upload_overrides);
+
+    // Vérifiez si l'upload a réussi
+    if (isset($upload['error']) || !isset($upload['file'])) {
+        return new WP_Error('rest_upload_error', esc_html__('Erreur lors de l\'upload du fichier.', 'my-text-domain'), array('status' => 500));
+    }
+
+    // Le fichier est uploadé, maintenant, insérez-le dans la base de données
+    $file_name = basename($upload['file']);
+    $file_type = wp_check_filetype($upload['file']);
+    $file_url = $upload['url'];
+
+    // Créez le post attachment pour l'image
+    $attachment = array(
+        'post_mime_type' => $file_type['type'],
+        'post_title' => sanitize_file_name($file_name),
+        'post_content' => '',
+        'post_status' => 'inherit'
+    );
+
+    // Insérez le post dans la base de données
+    $attach_id = wp_insert_attachment($attachment, $upload['file']);
+    $attach_data = wp_generate_attachment_metadata($attach_id, $upload['file']);
+    wp_update_attachment_metadata($attach_id, $attach_data);
+
+    // Maintenant, stockez les informations de l'image dans votre table personnalisée
+    global $wpdb;
+    $wpdb->insert(
+        $wpdb->prefix . 'imagemail',
+        array(
+            'filename' => $file_name,
+            'alt_text' => sanitize_text_field($request['alt_text']),
+            'url' => $file_url
+        ),
+        array(
+            '%s',
+            '%s',
+            '%s'
+        )
+    );
+
+    // Vérifiez si l'insertion a réussi
+    if ($wpdb->insert_id == 0) {
+        return new WP_Error('rest_upload_error', esc_html__('Erreur lors de l\'enregistrement de l\'image dans la base de données.', 'my-text-domain'), array('status' => 500));
+    }
+
+    // Tout a bien fonctionné, retournez l'ID de l'attachment
+    return new WP_REST_Response(array('id' => $attach_id, 'url' => $file_url), 200);
+}

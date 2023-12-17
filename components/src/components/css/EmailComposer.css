@@ -1,0 +1,74 @@
+.email-composer {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+}
+
+.email-composer input,
+.email-composer textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.email-composer input:focus,
+.email-composer textarea:focus {
+    border-color: #d14f4f;
+    outline: none;
+}
+
+.email-preview {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.email-preview h2 {
+    font-size: 1.25rem;
+    color: #d14f4f;
+    margin-bottom: 10px;
+}
+
+.email-preview h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+/* Pour le bouton de soumission ou autres actions */
+.button {
+    background-color: #d14f4f;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.button:hover {
+    background-color: #bb4545;
+}
+
+/* Responsivité */
+@media (max-width: 768px) {
+    .email-composer,
+    .email-preview {
+        width: auto;
+        padding: 10px;
+    }
+}
